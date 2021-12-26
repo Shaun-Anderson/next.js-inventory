@@ -4,7 +4,9 @@ import { Table } from "@mantine/core";
 import { ArrowUp, ArrowDown } from "phosphor-react";
 
 export interface ReactTableProps<T extends Record<string, unknown>>
-  extends TableOptions<T> {}
+  extends TableOptions<T> {
+  onRowClick?: (data: T) => void;
+}
 
 export function ReactTable<T extends Record<string, unknown>>(
   props: PropsWithChildren<ReactTableProps<T>>
@@ -48,7 +50,16 @@ export function ReactTable<T extends Record<string, unknown>>(
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
+            <tr
+              {...row.getRowProps({
+                onClick: (e, t) => {
+                  props.onRowClick ? props.onRowClick(row.original) : return;
+                },
+                style: {
+                  cursor: props.onRowClick ? "pointer" : "default"
+                },
+              })}
+            >
               {row.cells.map((cell) => {
                 return (
                   <td
