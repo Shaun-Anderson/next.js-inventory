@@ -1,20 +1,41 @@
-import { Title, Text, Grid, Col } from "@mantine/core";
+import { Title, Text, Grid, Col, Group, ThemeIcon } from "@mantine/core";
+import { Laptop, HardDrives, Database } from "phosphor-react";
+import Breadcrumbs from "./breadcrumb";
 
 interface HeaderProps {
+  icon?: React.ReactNode;
   title: string;
   subTitle?: string;
   rightArea?: React.ReactNode;
 }
-export default function Header({ title, rightArea, subTitle }: HeaderProps) {
+export default function Header({
+  icon,
+  title,
+  rightArea,
+  subTitle,
+}: HeaderProps) {
   return (
     <Grid sx={{ marginBottom: 10 }}>
       <Col span={6}>
-        <Title order={2}>{title}</Title>
-        <Text size="xs" color="gray">
-          {subTitle}
-        </Text>
+        <Group>
+          {icon && icon}
+          <div>
+            <Breadcrumbs />
+            <Title order={2}>{title}</Title>
+            <Text size="xs" color="gray">
+              {subTitle}
+            </Text>
+          </div>
+        </Group>
       </Col>
-      <Col span={6} sx={{ textAlign: "right" }}>
+      <Col
+        span={6}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
+      >
         {rightArea && rightArea}
       </Col>
     </Grid>
