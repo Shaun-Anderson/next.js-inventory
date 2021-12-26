@@ -1,0 +1,12 @@
+.root {
+    display: flex;
+    height: 100vh;
+  }
+
+  .main {
+    width: calc(100vw - 300px);
+  }
+  
+  .main > section {
+    padding: 32px;
+  }
