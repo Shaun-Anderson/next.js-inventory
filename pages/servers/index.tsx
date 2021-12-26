@@ -1,12 +1,22 @@
 import type { ReactElement } from "react";
 import Layout from "../../components/layout";
-import { Button, ActionIcon, Grid, Col, TextInput, Group } from "@mantine/core";
+import {
+  Button,
+  ActionIcon,
+  Grid,
+  Col,
+  TextInput,
+  Group,
+  ThemeIcon,
+} from "@mantine/core";
 import { ReactTable } from "../../components/table";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
 import Link from "next/link";
 import Header from "../../components/header";
-import { Trash, Pencil, Plus } from "phosphor-react";
+import { Trash, Pencil, Plus, HardDrives } from "phosphor-react";
+import { useRouter } from "next/router";
+import Breadcrumbs from "../../components/breadcrumb";
 
 type Server = {
   id: number;
@@ -18,6 +28,8 @@ type Server = {
 };
 
 export default function About() {
+  const router = useRouter();
+
   const columns = [
     {
       Header: "Id",
@@ -43,10 +55,20 @@ export default function About() {
       width: 50,
       Cell: () => (
         <Group spacing="5px">
-          <ActionIcon color="yellow" variant="light">
+          <ActionIcon
+            color="yellow"
+            variant="light"
+            onClick={(e: any) => {
+              e.stopPropagation();
+            }}
+          >
             <Pencil />
           </ActionIcon>
-          <ActionIcon color="red" variant="light">
+          <ActionIcon
+            color="red"
+            variant="light"
+            onClick={(e: any) => e.stopPropagation()}
+          >
             <Trash />
           </ActionIcon>
         </Group>
@@ -129,6 +151,11 @@ export default function About() {
   return (
     <section>
       <Header
+        icon={
+          <ThemeIcon size="lg" color="pink" variant="light">
+            <HardDrives weight="bold" />
+          </ThemeIcon>
+        }
         title="Servers"
         subTitle="On-site servers"
         rightArea={
@@ -144,7 +171,14 @@ export default function About() {
           </Link>
         }
       />
-      <ReactTable<Server> data={data} columns={columns} />
+      <ReactTable<Server>
+        data={data}
+        columns={columns}
+        onRowClick={(row: Server) => {
+          console.log(row);
+          router.push(`/servers/${row.id}`);
+        }}
+      />
     </section>
   );
 }
