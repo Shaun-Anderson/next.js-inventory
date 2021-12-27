@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Breadcrumbs as Base, Anchor } from "@mantine/core";
+import {
+  Breadcrumbs as Base,
+  Anchor,
+  useMantineTheme,
+  Text,
+} from "@mantine/core";
 
 interface Path {
   breadcumb: string;
@@ -20,6 +25,7 @@ const convertBreadcrumb = (string: string) => {
 export const Breadcrumbs = () => {
   const router = useRouter();
   const [breadcrumbs, setBreadcrumbs] = useState<Path[] | null>(null);
+  const theme = useMantineTheme();
 
   useEffect(() => {
     if (router) {
@@ -44,6 +50,12 @@ export const Breadcrumbs = () => {
   return (
     <Base>
       {breadcrumbs.map((breadcrumb, i) => {
+        if (i == breadcrumbs.length - 1)
+          return (
+            <Text key={i} size="xs" color="gray" sx={{ lineHeight: 1 }}>
+              {convertBreadcrumb(breadcrumb.breadcrumb)}
+            </Text>
+          );
         return (
           <Link href={breadcrumb.href} key={i}>
             <Anchor size="xs" variant="text" href={breadcrumb.href}>
