@@ -7,11 +7,13 @@ interface HeaderProps {
   title: string;
   subTitle?: string;
   rightArea?: React.ReactNode;
+  showBreadcumbs: boolean;
 }
 export default function Header({
   icon,
   title,
   rightArea,
+  showBreadcumbs,
   subTitle,
 }: HeaderProps) {
   return (
@@ -20,7 +22,7 @@ export default function Header({
         <Group>
           {icon && icon}
           <div>
-            <Breadcrumbs />
+            {showBreadcumbs && <Breadcrumbs />}
             <Title order={2}>{title}</Title>
             <Text size="xs" color="gray">
               {subTitle}
