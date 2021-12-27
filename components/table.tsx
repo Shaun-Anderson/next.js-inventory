@@ -5,15 +5,36 @@ import {
   useSortBy,
   useGlobalFilter,
   useAsyncDebounce,
+  usePagination,
 } from "react-table";
-import { Table, TextInput } from "@mantine/core";
-import { ArrowUp, ArrowDown, MagnifyingGlass } from "phosphor-react";
+import {
+  Select,
+  Table,
+  TextInput,
+  ScrollArea,
+  Text,
+  Group,
+  Button,
+  Divider,
+  ActionIcon,
+} from "@mantine/core";
+import {
+  ArrowUp,
+  ArrowDown,
+  MagnifyingGlass,
+  CaretLeft,
+  CaretDoubleLeft,
+  CaretRight,
+  CaretDoubleRight,
+} from "phosphor-react";
 
 export interface ReactTableProps<T extends Record<string, unknown>>
   extends TableOptions<T> {
   onRowClick?: (data: T) => void;
   searchable: boolean;
   selectable: boolean;
+  pagination: boolean;
+  loading: boolean;
 }
 
 // Define a default UI for filtering
@@ -29,19 +50,27 @@ function GlobalFilter({
   }, 200);
 
   return (
-    <TextInput
-      value={value || ""}
-      icon={<MagnifyingGlass weight="bold" />}
-      onChange={(e) => {
-        setValue(e.target.value);
-        onChange(e.target.value);
+    <Group
+      sx={{
+        position: "sticky",
+        top: 0,
+        backgroundColor: "white",
       }}
-      placeholder={`Search ${count} records...`}
-      style={{
-        fontSize: "1.1rem",
-        border: "0",
-      }}
-    />
+    >
+      <TextInput
+        value={value || ""}
+        icon={<MagnifyingGlass weight="bold" />}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onChange(e.target.value);
+        }}
+        placeholder={`Search ${count} records...`}
+        style={{
+          fontSize: "1.1rem",
+          border: "0",
+        }}
+      />
+    </Group>
   );
 }
 
@@ -55,16 +84,38 @@ export function ReactTable<T extends Record<string, unknown>>(
     headerGroups,
     rows,
     prepareRow,
-    state: { globalFilter },
+    state: { globalFilter, pageIndex, pageSize },
+    // global filter
     preGlobalFilteredRows,
     setGlobalFilter,
+    // pagination
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
   } = useTable(
     {
       ...props,
     },
     useGlobalFilter,
-    useSortBy
+    useSortBy,
+    usePagination
   );
+
+  const getPageRecordInfo = () => {
+    const firstRowNum = pageIndex * pageSize + 1;
+    // const totalRows = serverSideDataSource ? total : rows.length;
+    const totalRows = rows.length;
+
+    const currLastRowNum = (pageIndex + 1) * pageSize;
+    let lastRowNum = currLastRowNum < totalRows ? currLastRowNum : totalRows;
+    return `${firstRowNum} - ${lastRowNum} of ${totalRows}`;
+  };
 
   // Render the UI for your table
   return (
@@ -77,7 +128,13 @@ export function ReactTable<T extends Record<string, unknown>>(
         />
       )}
       <Table highlightOnHover={props.selectable} {...getTableProps()}>
-        <thead>
+        <thead
+          style={{
+            position: "sticky",
+            top: 36,
+            backgroundColor: "white",
+          }}
+        >
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
@@ -100,39 +157,149 @@ export function ReactTable<T extends Record<string, unknown>>(
             </tr>
           ))}
         </thead>
+        {/* <ScrollArea> */}
         <tbody {...getTableBodyProps()}>
-          {rows.map((row, i) => {
-            prepareRow(row);
-            return (
-              <tr
-                {...row.getRowProps({
-                  onClick: (e, t) => {
-                    props.onRowClick && props.onRowClick(row.original);
-                  },
-                  style: {
-                    cursor: props.onRowClick ? "pointer" : "default",
-                  },
-                })}
-              >
-                {row.cells.map((cell) => {
-                  return (
-                    <td
-                      {...cell.getCellProps({
-                        style: {
-                          minWidth: cell.column.minWidth,
-                          width: cell.column.width,
-                        },
-                      })}
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+          {props.pagination &&
+            page.map((row, i) => {
+              prepareRow(row);
+              return (
+                <tr
+                  {...row.getRowProps({
+                    onClick: (e, t) => {
+                      props.onRowClick && props.onRowClick(row.original);
+                    },
+                    style: {
+                      cursor: props.onRowClick ? "pointer" : "default",
+                    },
+                  })}
+                >
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          {!props.pagination &&
+            rows.map((row, i) => {
+              prepareRow(row);
+              return (
+                <tr
+                  {...row.getRowProps({
+                    onClick: (e, t) => {
+                      props.onRowClick && props.onRowClick(row.original);
+                    },
+                    style: {
+                      cursor: props.onRowClick ? "pointer" : "default",
+                    },
+                  })}
+                >
+                  {row.cells.map((cell) => {
+                    return (
+                      <td
+                        {...cell.getCellProps({
+                          style: {
+                            minWidth: cell.column.minWidth,
+                            width: cell.column.width,
+                          },
+                        })}
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
         </tbody>
+        {/* </ScrollArea> */}
       </Table>
+      {/* 
+        Pagination can be built however you'd like. 
+        This is just a very basic UI implementation:
+      */}
+      {props.pagination && (
+        <div
+          style={{
+            position: "sticky",
+            bottom: 0,
+            backgroundColor: "white",
+            paddingTop: 5,
+          }}
+        >
+          <Group spacing="5px">
+            <ActionIcon
+              variant="light"
+              onClick={() => gotoPage(0)}
+              disabled={!canPreviousPage}
+            >
+              <CaretDoubleLeft weight="bold" />
+            </ActionIcon>
+            <ActionIcon
+              variant="light"
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage}
+            >
+              <CaretLeft weight="bold" />
+            </ActionIcon>
+            <ActionIcon
+              variant="light"
+              onClick={() => nextPage()}
+              disabled={!canNextPage}
+            >
+              <CaretRight weight="bold" />
+            </ActionIcon>
+            <ActionIcon
+              variant="light"
+              onClick={() => gotoPage(pageCount - 1)}
+              disabled={!canNextPage}
+            >
+              <CaretDoubleRight weight="bold" />
+            </ActionIcon>
+            <Divider orientation="vertical" mx="sm" />
+
+            <Text size="sm">
+              Page{" "}
+              <strong>
+                {pageIndex + 1} of {pageOptions.length}
+              </strong>{" "}
+            </Text>
+            <Divider orientation="vertical" mx="sm" />
+
+            <Text size="sm">{getPageRecordInfo()}</Text>
+
+            {/* <span>
+  | Go to page:{" "}
+  <input
+    type="number"
+    defaultValue={pageIndex + 1}
+    onChange={(e) => {
+      const page = e.target.value ? Number(e.target.value) - 1 : 0;
+      gotoPage(page);
+    }}
+    style={{ width: "100px" }}
+  />
+</span> */}
+            <Divider orientation="vertical" mx="sm" />
+            <Text size="sm">Rows per page:</Text>
+            <Select
+              value={pageSize.toString()}
+              style={{ width: "72px" }}
+              onChange={(e) => {
+                setPageSize(Number(e));
+              }}
+              data={[
+                { value: "10", label: "10" },
+                { value: "20", label: "20" },
+                { value: "30", label: "30" },
+                { value: "40", label: "40" },
+                { value: "50", label: "50" },
+              ]}
+            />
+          </Group>
+        </div>
+      )}
     </>
   );
 }
