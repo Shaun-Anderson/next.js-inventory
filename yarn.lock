@@ -201,6 +201,15 @@
     react-popper "^2.2.5"
     react-textarea-autosize "^8.3.2"
 
+"@mantine/dates@^3.4.3":
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@mantine/dates/-/dates-3.4.3.tgz#1d1ecf9d116e113fa85151a868a6020f72275546"
+  integrity sha512-oSNhcard5mOs60YqpI9hc6rv60fH/+2NqCnIoktbiUK9QccXpLG9TMHNml+cz/K3G4G4lqTns/R/fnntKU/KKA==
+  dependencies:
+    "@popperjs/core" "^2.9.3"
+    clsx "^1.1.1"
+    react-popper "^2.2.5"
+
 "@mantine/hooks@^3.4.3":
   version "3.4.3"
   resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-3.4.3.tgz#ac2b15c4fd23978fad72055ea6cf4d85e525488a"
@@ -1079,6 +1088,11 @@ data-uri-to-buffer@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-3.0.1.tgz#594b8973938c5bc2c33046535785341abc4f3636"
   integrity sha512-WboRycPNsVw3B3TL559F7kuBUM4d8CgMEvk6xEJlOp7OBPjt6G7z8WMWlD2rOFZLk6OYfFIUGsCOWzcQH9K2og==
+
+dayjs@^1.10.7:
+  version "1.10.7"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.7.tgz#2cf5f91add28116748440866a0a1d26f3a6ce468"
+  integrity sha512-P6twpd70BcPK34K26uJ1KT3wlhpuOAPoMwJzpsIWUxHZ7wpmbdZL/hQqBDfz7hGurYSa5PhzdhDHtt319hL3ig==
 
 debug@2, debug@^2.6.9:
   version "2.6.9"
