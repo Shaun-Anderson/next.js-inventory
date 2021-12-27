@@ -5,6 +5,8 @@ import type { AppProps } from "next/app";
 import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import "regenerator-runtime/runtime";
+import { Auth } from "@supabase/ui";
+import { supabase } from "../utils/supabaseClient";
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -27,7 +29,11 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         colorScheme: "light",
       }}
     >
-      <ModalsProvider>{getLayout(<Component {...pageProps} />)}</ModalsProvider>
+      <ModalsProvider>
+        <Auth.UserContextProvider supabaseClient={supabase}>
+          {getLayout(<Component {...pageProps} />)}
+        </Auth.UserContextProvider>
+      </ModalsProvider>
     </MantineProvider>
   );
 }

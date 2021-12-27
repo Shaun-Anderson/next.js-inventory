@@ -1,12 +1,15 @@
-import type { ReactElement } from 'react'
-import Layout from '../components/layout'
-import Sidebar from '../components/sidebar'
-
+import { ReactElement, useEffect, useState } from "react";
+import Layout from "../components/layout";
+import Sidebar from "../components/sidebar";
+import { supabase } from "../utils/supabaseClient";
+import { useRouter } from "next/router";
 
 export default function Index() {
+  const router = useRouter();
   return (
     <section>
       <h2>Layout Example (Index)</h2>
+      <button onClick={() => router.push("/login")}>Log in</button>
       <p>
         This example adds a property <code>getLayout</code> to your page,
         allowing you to return a React component for the layout. This allows you
@@ -26,18 +29,10 @@ export default function Index() {
       </p>
       <h3>Try It Out</h3>
       <p>
-        To visualize this, try tying in the search input in the{' '}
+        To visualize this, try tying in the search input in the{" "}
         <code>Sidebar</code> and then changing routes. You'll notice the input
         state is persisted.
       </p>
     </section>
-  )
-}
-
-Index.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <Layout>
-      {page}
-    </Layout>
-  )
+  );
 }
