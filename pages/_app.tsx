@@ -1,34 +1,33 @@
-import '../styles/globals.css'
-import type { ReactElement, ReactNode } from 'react'
-import type { NextPage } from 'next'
-import type { AppProps } from 'next/app'
-import { MantineProvider } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
+import "../styles/globals.css";
+import type { ReactElement, ReactNode } from "react";
+import type { NextPage } from "next";
+import type { AppProps } from "next/app";
+import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import "regenerator-runtime/runtime";
 
 type NextPageWithLayout = NextPage & {
-  getLayout?: (page: ReactElement) => ReactNode
-}
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout
-}
+  Component: NextPageWithLayout;
+};
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout ?? ((page) => page)
+  const getLayout = Component.getLayout ?? ((page) => page);
 
-  return (<MantineProvider
-  withGlobalStyles
-  withNormalizeCSS
-  theme={{
-    /** Put your mantine theme override here */
-    colorScheme: 'light',
-  }}
->
-<ModalsProvider>
-
-  {getLayout(<Component {...pageProps} />)}
-  </ModalsProvider>
-</MantineProvider>)
-  
+  return (
+    <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
+      theme={{
+        /** Put your mantine theme override here */
+        colorScheme: "light",
+      }}
+    >
+      <ModalsProvider>{getLayout(<Component {...pageProps} />)}</ModalsProvider>
+    </MantineProvider>
+  );
 }
