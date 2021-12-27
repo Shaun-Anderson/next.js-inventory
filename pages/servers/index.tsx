@@ -11,6 +11,7 @@ import {
   Card,
   Menu,
   Divider,
+  Badge,
 } from "@mantine/core";
 import { ReactTable } from "../../components/table";
 import { useModals } from "@mantine/modals";
@@ -23,14 +24,16 @@ import Breadcrumbs from "../../components/breadcrumb";
 
 type Server = {
   id: number;
+  name: string;
   assetNumber: string;
+  status: string;
+  location: string;
   brand: string;
   model: string;
   serial: string;
   macAddress: string;
   ipAddress: string;
   port: number;
-  location: string;
 };
 
 export default function About() {
@@ -38,8 +41,32 @@ export default function About() {
 
   const columns = [
     {
-      Header: "Asset Number",
-      accessor: "assetNumber",
+      Header: "Server",
+      accessor: "name",
+      Cell: (data: any) => (
+        <Group spacing="5px" direction="column">
+          <Text size="sm" weight={500}>
+            {data.row.original.name}
+          </Text>
+          <Text size="xs" color="gray">
+            {data.row.original.assetNumber}
+          </Text>
+        </Group>
+      ),
+    },
+    {
+      Header: "Status",
+      accessor: "status",
+      Cell: (data: any) => {
+        switch (data.row.original.status) {
+          case "online":
+            return (
+              <Badge size="sm" color="green">
+                {data.row.original.status}
+              </Badge>
+            );
+        }
+      },
     },
     {
       Header: "Brand",
@@ -54,9 +81,9 @@ export default function About() {
       id: "networkLocation",
       Cell: (data: any) => (
         <Group spacing="5px" direction="column">
-          <Text size="sm">{data.row.original.ipAddress}</Text>
+          <Text size="sm">IP: {data.row.original.ipAddress}</Text>
           <Text size="xs" color="gray">
-            {data.row.original.port}
+            port: {data.row.original.port}
           </Text>
         </Group>
       ),
@@ -107,6 +134,8 @@ export default function About() {
     {
       id: 1,
       assetNumber: "Test #1",
+      name: "Hades",
+      status: "online",
       brand: "Microsoft",
       model: "Test Model",
       serial: "00000001",
@@ -118,7 +147,120 @@ export default function About() {
     {
       id: 2,
       assetNumber: "Test #2",
+      name: "Zues",
+      status: "online",
       brand: "Lenovo",
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      name: "Posiden",
+      status: "online",
+      brand: "Microsoft",
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      name: "Hades",
+
+      status: "online",
+      brand: "Microsoft",
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      brand: "Microsoft",
+      status: "online",
+      name: "Hades",
+
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      status: "online",
+      name: "Hades",
+
+      brand: "Microsoft",
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      status: "online",
+      name: "Hades",
+
+      brand: "Microsoft",
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      status: "online",
+      name: "Hades",
+
+      brand: "Microsoft",
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      brand: "Microsoft",
+      status: "online",
+      name: "Hades",
+
+      model: "Test Model",
+      serial: "00000001",
+      macAddress: "1234",
+      ipAddress: "192.100.1.202",
+      port: 4000,
+      location: "Building B",
+    },
+    {
+      id: 3,
+      assetNumber: "Test #3",
+      brand: "Microsoft",
+      status: "online",
+      name: "Hades",
+
       model: "Test Model",
       serial: "00000001",
       macAddress: "1234",
@@ -131,6 +273,9 @@ export default function About() {
       assetNumber: "Test #3",
       brand: "Microsoft",
       model: "Test Model",
+      status: "online",
+      name: "Hades",
+
       serial: "00000001",
       macAddress: "1234",
       ipAddress: "192.100.1.202",
@@ -168,17 +313,20 @@ export default function About() {
           </Link>
         }
       />
-      <Card>
+      <Card sx={{ display: "block", overflowY: "auto" }}>
+        {/* <div style={{ overflow: "hidden" }}> */}
         <ReactTable<Server>
           data={data}
           searchable
           selectable
+          pagination
           columns={columns}
           onRowClick={(row: Server) => {
             console.log(row);
             router.push(`/servers/${row.id}`);
           }}
         />
+        {/* </div> */}
       </Card>
     </section>
   );
