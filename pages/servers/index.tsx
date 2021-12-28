@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Layout from "../../components/layout";
 import {
   Button,
@@ -16,40 +16,57 @@ import {
 import { ReactTable } from "../../components/table";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
+import useSWR from "swr";
 import Link from "next/link";
 import Header from "../../components/header";
 import { Trash, Pencil, Plus, HardDrives, GitBranch } from "phosphor-react";
 import { useRouter } from "next/router";
 import Breadcrumbs from "../../components/breadcrumb";
+import { supabase } from "../../utils/supabaseClient";
 
 type Server = {
   id: number;
   name: string;
-  assetNumber: string;
+  asset_number: string;
   status: string;
   location: string;
   brand: string;
   model: string;
   serial: string;
-  macAddress: string;
-  ipAddress: string;
+  mac_address: string;
+  ip_address: string;
   port: number;
 };
 
+async function getServers() {
+  const user = supabase.auth.user();
+  const { data: posts, error } = await supabase
+    .from("servers")
+    .select("*")
+    .eq("user_id", user?.id);
+
+  if (error) throw error.message;
+  return posts;
+}
+
 export default function About() {
   const router = useRouter();
-
+  const { data: servers, error } = useSWR("servers", getServers);
+  if (error) <p>Loading failed...</p>;
+  if (!servers) <h1>Loading...</h1>;
+  if (servers == undefined) <h1>Loading...</h1>;
+  console.log(servers);
   const columns = [
     {
       Header: "Server",
-      accessor: "name",
+      id: "server",
       Cell: (data: any) => (
         <Group spacing="5px" direction="column">
           <Text size="sm" weight={500}>
-            {data.row.original.name}
+            {data.row.original.name ?? ""}
           </Text>
           <Text size="xs" color="gray">
-            {data.row.original.assetNumber}
+            {data.row.original.asset_number}
           </Text>
         </Group>
       ),
@@ -76,18 +93,18 @@ export default function About() {
       Header: "Model",
       accessor: "model",
     },
-    {
-      Header: "Network",
-      id: "networkLocation",
-      Cell: (data: any) => (
-        <Group spacing="5px" direction="column">
-          <Text size="sm">IP: {data.row.original.ipAddress}</Text>
-          <Text size="xs" color="gray">
-            port: {data.row.original.port}
-          </Text>
-        </Group>
-      ),
-    },
+    // {
+    //   Header: "Network",
+    //   id: "networkLocation",
+    //   Cell: (data: any) => (
+    //     <Group spacing="5px" direction="column">
+    //       <Text size="sm">IP: {data.row.original.ipAddress}</Text>
+    //       <Text size="xs" color="gray">
+    //         port: {data.row.original.port}
+    //       </Text>
+    //     </Group>
+    //   ),
+    // },
     {
       Header: "",
       id: "col13",
@@ -284,10 +301,6 @@ export default function About() {
     },
   ]);
 
-  const add = (newServer: Server) => {
-    setData([...data, newServer]);
-  };
-
   return (
     <section
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
@@ -316,7 +329,7 @@ export default function About() {
       <Card sx={{ display: "block", overflowY: "auto" }}>
         {/* <div style={{ overflow: "hidden" }}> */}
         <ReactTable<Server>
-          data={data}
+          data={servers ?? []}
           searchable
           selectable
           pagination

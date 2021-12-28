@@ -1,4 +1,4 @@
-import { ReactElement, forwardRef } from "react";
+import { ReactElement, forwardRef, useState } from "react";
 import Layout from "../../components/layout";
 import Sidebar from "../../components/sidebar";
 import {
@@ -15,6 +15,7 @@ import {
   Card,
   Divider,
   Center,
+  LoadingOverlay,
 } from "@mantine/core";
 import { ReactTable } from "../../components/table";
 import { useModals } from "@mantine/modals";
@@ -23,10 +24,14 @@ import Link from "next/link";
 import Header from "../../components/header";
 import Breadcrumbs from "../../components/breadcrumb";
 import { DatePicker } from "@mantine/dates";
+import { supabase } from "../../utils/supabaseClient";
 
 type Server = {
   id: number;
+  name: string;
   assetNumber: string;
+  location: string;
+  datePurchased: Date;
   brand: string;
   model: string;
   serial: string;
@@ -34,96 +39,37 @@ type Server = {
 };
 
 export default function About() {
-  const columns = [
-    {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
-      Header: "Asset Number",
-      accessor: "assetNumber",
-    },
-    {
-      Header: "Brand",
-      accessor: "brand",
-    },
-    {
-      Header: "Model",
-      accessor: "model",
-    },
-  ];
+  const [loading, setLoading] = useState(false);
 
-  const data: Server[] = [
-    {
-      id: 1,
-      assetNumber: "Test #1",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-    },
-    {
-      id: 2,
-      assetNumber: "Test #2",
-      brand: "Lenovo",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-    },
-  ];
-
-  const modals = useModals();
-  const add = () => {
+  async function add(server: Server) {
+    setLoading(true);
+    const user = supabase.auth.user();
+    await supabase.from("servers").insert({
+      asset_number: server.assetNumber,
+      name: server.name,
+      // location: server.location,
+      date_purchased: server.datePurchased,
+      user_id: user?.id,
+    });
+    setLoading(false);
     console.log("Add");
-  };
+  }
   const form = useForm<Server>({
     initialValues: {
       id: 0,
+      name: "",
       assetNumber: "",
+      location: "",
+      datePurchased: new Date(),
       brand: "",
       model: "",
       serial: "",
       macAddress: "",
     },
-    validationRules: {
-      assetNumber: (value) => /^\S+@\S+$/.test(value),
-    },
+    // validationRules: {
+    //   assetNumber: (value) => /^\S+@\S+$/.test(value),
+    // },
   });
-  const forceUpdate = useForceUpdate();
-
-  const openAddModal = () => {
-    const add = () => {
-      console.log("Add");
-      modals.closeModal(id);
-    };
-
-    const id = modals.openModal({
-      title: "Add Server",
-      children: (
-        <form onSubmit={form.onSubmit((values) => add())}>
-          <TextInput
-            required
-            label="Asset Number"
-            onChange={() => {
-              form.getInputProps("assetNumber").onChange();
-              forceUpdate();
-            }}
-            error={form.getInputProps("assetNumber").error}
-          />
-          <TextInput required label="Asset Number" />
-          <Button type="submit">Submit</Button>
-        </form>
-      ),
-    });
-  };
 
   const SelectItem = forwardRef(
     ({ image, label, description, ...others }, ref) => (
@@ -160,7 +106,9 @@ export default function About() {
       <Center>
         <div style={{ maxWidth: 800, width: "100%", position: "relative" }}>
           <Card>
-            <form onSubmit={form.onSubmit((values) => add())}>
+            <LoadingOverlay visible={loading} />
+
+            <form onSubmit={form.onSubmit((values) => add(values))}>
               <Grid>
                 <Col span={3}>
                   <TextInput
@@ -172,8 +120,15 @@ export default function About() {
                 <Col span={3}>
                   <TextInput
                     required
+                    label="Name"
+                    {...form.getInputProps("name")}
+                  />
+                </Col>
+                <Col span={3}>
+                  <TextInput
+                    required
                     label="Location"
-                    {...form.getInputProps("assetNumber")}
+                    {...form.getInputProps("location")}
                   />
                 </Col>
                 <Col span={6}>
@@ -182,6 +137,7 @@ export default function About() {
                     placeholder="Purchased date"
                     label="Purchased Date"
                     required
+                    {...form.getInputProps("datePurchased")}
                   />
                 </Col>
               </Grid>
