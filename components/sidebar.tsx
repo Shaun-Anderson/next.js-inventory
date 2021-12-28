@@ -16,6 +16,7 @@ import {
   Database,
   House,
   CaretRight,
+  Package,
 } from "phosphor-react";
 import { useRouter } from "next/router";
 import { createStyles } from "@mantine/core";
@@ -87,10 +88,15 @@ export default function Sidebar({ session }: any) {
 
   return (
     <Navbar width={{ base: 300 }} height={"100%"} padding="xs">
-      <Navbar.Section>
-        <Title order={2} sx={{ padding: 10 }}>
-          Inventory
-        </Title>
+      <Navbar.Section style={{ padding: "10px" }}>
+        <Group spacing="5px">
+          <ThemeIcon size="lg" variant="light">
+            <Package size={24} weight="bold" />
+          </ThemeIcon>
+          <Title order={2} sx={{ padding: 10 }}>
+            Inventory
+          </Title>
+        </Group>
       </Navbar.Section>
       <Navbar.Section grow mt="lg">
         <UnstyledButton
@@ -142,9 +148,9 @@ export default function Sidebar({ session }: any) {
 
         <UnstyledButton
           className={cx(classes.button, {
-            [classes.active]: router.pathname == "/about",
+            [classes.active]: router.pathname == "/databases",
           })}
-          onClick={() => router.push("/about")}
+          onClick={() => router.push("/databases")}
           type="button"
           style={{ width: "100%" }}
         >

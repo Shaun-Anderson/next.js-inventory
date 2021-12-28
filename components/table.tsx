@@ -17,6 +17,7 @@ import {
   Button,
   Divider,
   ActionIcon,
+  Loader,
 } from "@mantine/core";
 import {
   ArrowUp,
@@ -119,119 +120,131 @@ export function ReactTable<T extends Record<string, unknown>>(
 
   // Render the UI for your table
   return (
-    <>
-      {props.searchable && (
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      )}
-      <Table highlightOnHover={props.selectable} {...getTableProps()}>
-        <thead
-          style={{
-            position: "sticky",
-            top: 36,
-            backgroundColor: "white",
-          }}
-        >
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th
-                  {...column.getHeaderProps({
-                    ...column.getSortByToggleProps(),
-                    style: {
-                      minWidth: column.minWidth,
-                      width: column.width,
-                    },
-                  })}
-                >
-                  {column.render("Header")}
-                  {/* Add a sort direction indicator */}
-                  <span>
-                    {column.isSorted ? (
-                      column.isSortedDesc ? (
-                        <ArrowDown />
+    <div>
+      <div>
+        {props.searchable && (
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
+        )}
+      </div>
+      <div
+        style={{
+          display: "block",
+          maxWidth: "100%",
+          overflowX: "scroll",
+          overflowY: "hidden",
+        }}
+      >
+        <Table highlightOnHover={props.selectable} {...getTableProps()}>
+          <thead
+            style={{
+              position: "sticky",
+              top: 0,
+              backgroundColor: "white",
+            }}
+          >
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th
+                    {...column.getHeaderProps({
+                      ...column.getSortByToggleProps(),
+                      style: {
+                        minWidth: column.minWidth,
+                        width: column.width,
+                      },
+                    })}
+                  >
+                    {column.render("Header")}
+                    {/* Add a sort direction indicator */}
+                    <span>
+                      {column.isSorted ? (
+                        column.isSortedDesc ? (
+                          <ArrowDown />
+                        ) : (
+                          <ArrowUp />
+                        )
                       ) : (
-                        <ArrowUp />
-                      )
-                    ) : (
-                      ""
-                    )}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        {/* <ScrollArea> */}
-        <tbody {...getTableBodyProps()}>
-          {props.pagination &&
-            page.map((row, i) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps({
-                    onClick: (e, t) => {
-                      props.onRowClick && props.onRowClick(row.original);
-                    },
-                    style: {
-                      cursor: props.onRowClick ? "pointer" : "default",
-                    },
-                  })}
-                >
-                  {row.cells.map((cell) => {
-                    return (
-                      <td
-                        {...cell.getCellProps({
-                          style: {
-                            minWidth: cell.column.minWidth,
-                            width: cell.column.width,
-                          },
-                        })}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          {!props.pagination &&
-            rows.map((row, i) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps({
-                    onClick: (e, t) => {
-                      props.onRowClick && props.onRowClick(row.original);
-                    },
-                    style: {
-                      cursor: props.onRowClick ? "pointer" : "default",
-                    },
-                  })}
-                >
-                  {row.cells.map((cell) => {
-                    return (
-                      <td
-                        {...cell.getCellProps({
-                          style: {
-                            minWidth: cell.column.minWidth,
-                            width: cell.column.width,
-                          },
-                        })}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-        </tbody>
-        {/* </ScrollArea> */}
-      </Table>
+                        ""
+                      )}
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          {props.loading && <Loader />}
+          {/* <ScrollArea> */}
+          <tbody {...getTableBodyProps()}>
+            {props.pagination &&
+              page.map((row, i) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps({
+                      onClick: (e, t) => {
+                        props.onRowClick && props.onRowClick(row.original);
+                      },
+                      style: {
+                        cursor: props.onRowClick ? "pointer" : "default",
+                      },
+                    })}
+                  >
+                    {row.cells.map((cell) => {
+                      return (
+                        <td
+                          {...cell.getCellProps({
+                            style: {
+                              minWidth: cell.column.minWidth,
+                              width: cell.column.width,
+                            },
+                          })}
+                        >
+                          {cell.render("Cell")}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            {!props.pagination &&
+              rows.map((row, i) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps({
+                      onClick: (e, t) => {
+                        props.onRowClick && props.onRowClick(row.original);
+                      },
+                      style: {
+                        cursor: props.onRowClick ? "pointer" : "default",
+                      },
+                    })}
+                  >
+                    {row.cells.map((cell) => {
+                      return (
+                        <td
+                          {...cell.getCellProps({
+                            style: {
+                              minWidth: cell.column.minWidth,
+                              width: cell.column.width,
+                            },
+                          })}
+                        >
+                          {cell.render("Cell")}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+          </tbody>
+          {/* </ScrollArea> */}
+        </Table>
+      </div>
       {/* 
         Pagination can be built however you'd like. 
         This is just a very basic UI implementation:
@@ -285,19 +298,6 @@ export function ReactTable<T extends Record<string, unknown>>(
             <Divider orientation="vertical" mx="sm" />
 
             <Text size="sm">{getPageRecordInfo()}</Text>
-
-            {/* <span>
-  | Go to page:{" "}
-  <input
-    type="number"
-    defaultValue={pageIndex + 1}
-    onChange={(e) => {
-      const page = e.target.value ? Number(e.target.value) - 1 : 0;
-      gotoPage(page);
-    }}
-    style={{ width: "100px" }}
-  />
-</span> */}
             <Divider orientation="vertical" mx="sm" />
             <Text size="sm">Rows per page:</Text>
             <Select
@@ -317,6 +317,6 @@ export function ReactTable<T extends Record<string, unknown>>(
           </Group>
         </div>
       )}
-    </>
+    </div>
   );
 }

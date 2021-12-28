@@ -1,8 +1,11 @@
 import type { ReactElement } from "react";
 import Layout from "../components/layout";
 import Sidebar from "../components/sidebar";
-import { Button, Title } from "@mantine/core";
+import { Button, ThemeIcon, Title } from "@mantine/core";
 import { ReactTable } from "../components/table";
+import { Database, HardDrives, Plus } from "phosphor-react";
+import Link from "next/link";
+import Header from "../components/header";
 
 type Server = {
   id: number;
@@ -64,8 +67,27 @@ export default function About() {
     <section
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
-      {" "}
-      <Title order={1}>Dashboard</Title>
+      <Header
+        icon={
+          <ThemeIcon size="lg" color="teal" variant="light">
+            <Database weight="bold" />
+          </ThemeIcon>
+        }
+        title="Databases"
+        subTitle="On-site databases"
+        rightArea={
+          <Link href="servers/add">
+            <Button
+              component="a"
+              variant="light"
+              color="cyan"
+              leftIcon={<Plus weight="bold" />}
+            >
+              Add Server
+            </Button>
+          </Link>
+        }
+      />
       <ReactTable<Server> data={data} columns={columns} />
     </section>
   );

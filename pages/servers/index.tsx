@@ -60,6 +60,7 @@ export default function About() {
     {
       Header: "Server",
       id: "server",
+      minWidth: 200,
       Cell: (data: any) => (
         <Group spacing="5px" direction="column">
           <Text size="sm" weight={500}>
@@ -74,6 +75,7 @@ export default function About() {
     {
       Header: "Status",
       accessor: "status",
+      minWidth: 100,
       Cell: (data: any) => {
         switch (data.row.original.status) {
           case "online":
@@ -108,9 +110,8 @@ export default function About() {
     {
       Header: "",
       id: "col13",
-      maxWidth: 100,
-      minWidth: 100,
-      width: 100,
+      minWidth: 120,
+      maxWidth: 120,
       Cell: () => (
         <Group spacing="5px">
           <Menu
