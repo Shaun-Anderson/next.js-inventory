@@ -138,7 +138,15 @@ export function ReactTable<T extends Record<string, unknown>>(
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                <th
+                  {...column.getHeaderProps({
+                    ...column.getSortByToggleProps(),
+                    style: {
+                      minWidth: column.minWidth,
+                      width: column.width,
+                    },
+                  })}
+                >
                   {column.render("Header")}
                   {/* Add a sort direction indicator */}
                   <span>
@@ -175,7 +183,16 @@ export function ReactTable<T extends Record<string, unknown>>(
                 >
                   {row.cells.map((cell) => {
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <td
+                        {...cell.getCellProps({
+                          style: {
+                            minWidth: cell.column.minWidth,
+                            width: cell.column.width,
+                          },
+                        })}
+                      >
+                        {cell.render("Cell")}
+                      </td>
                     );
                   })}
                 </tr>
