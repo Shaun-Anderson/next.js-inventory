@@ -18,7 +18,7 @@ export default function Layout({ children }) {
 
   // const [session, setSession] = useState(null);
   const session = supabase.auth.session();
-  console.log(session);
+  // console.log(session);
   // const { data, error } = useSWR(
   //   session ? ["/api/getUser", session.access_token] : null,
   //   fetcher

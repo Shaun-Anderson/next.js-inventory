@@ -23,6 +23,7 @@ import { Trash, Pencil, Plus, HardDrives, GitBranch } from "phosphor-react";
 import { useRouter } from "next/router";
 import Breadcrumbs from "../../components/breadcrumb";
 import { supabase } from "../../utils/supabaseClient";
+import { getServers } from "../api/server";
 
 type Server = {
   id: number;
@@ -38,20 +39,9 @@ type Server = {
   port: number;
 };
 
-async function getServers() {
-  const user = supabase.auth.user();
-  const { data: posts, error } = await supabase
-    .from("servers")
-    .select("*")
-    .eq("user_id", user?.id);
-
-  if (error) throw error.message;
-  return posts;
-}
-
 export default function About() {
   const router = useRouter();
-  const { data: servers, error } = useSWR("servers", getServers);
+  const { data: servers, error } = useSWR("api/server", getServers);
   if (error) <p>Loading failed...</p>;
   if (!servers) <h1>Loading...</h1>;
   if (servers == undefined) <h1>Loading...</h1>;

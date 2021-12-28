@@ -11,6 +11,7 @@ import {
   Grid,
   Col,
   Progress,
+  Loader,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
@@ -18,6 +19,10 @@ import Link from "next/link";
 import Header from "../../components/header";
 import { Trash, Pencil, Plus } from "phosphor-react";
 import { ReactTable } from "../../components/table";
+import { useRouter } from "next/router";
+import { supabase } from "../../utils/supabaseClient";
+import useSWR from "swr";
+import { getServer } from "../api/server";
 
 type Server = {
   id: number;
@@ -42,7 +47,29 @@ type Storage = {
 };
 
 export default function About() {
+  const router = useRouter();
   const theme = useMantineTheme();
+  const { id } = router.query;
+  // if (!id) {
+  //   return <Loader />;
+  // }
+  console.log(`ID: ${id}`);
+  const { data, error } = useSWR(id, getServer);
+  console.log(data, error);
+  const [storageData, setStorageData] = useState<Storage[]>([
+    {
+      id: 1,
+      driveClassification: "D",
+      driveName: "Shared",
+      brand: "Kensinton",
+      model: "1",
+      capacity: 100,
+      capacityClassification: "GB",
+    },
+  ]);
+
+  if (error) return <p>Loading failed...</p>;
+  if (!data) return <Loader />;
 
   const columns = [
     {
@@ -74,35 +101,12 @@ export default function About() {
     },
   ];
 
-  const data: Server = {
-    id: 1,
-    assetNumber: "Test #1",
-    location: "Building B",
-    status: "online",
-    brand: "Microsoft",
-    model: "Test Model",
-    serial: "00000001",
-    macAddress: "1234",
-  };
-
-  const [storageData, setStorageData] = useState<Storage[]>([
-    {
-      id: 1,
-      driveClassification: "D",
-      driveName: "Shared",
-      brand: "Kensinton",
-      model: "1",
-      capacity: 100,
-      capacityClassification: "GB",
-    },
-  ]);
-
   return (
     <section>
       <Header
-        title={data.assetNumber}
+        title={data.asset_number}
         showBreadcumbs
-        subTitle={data.serial}
+        // subTitle={data.serial}
         rightArea={
           <Link href="servers/add">
             <Button
@@ -118,7 +122,7 @@ export default function About() {
       />
       <Grid>
         <Col span={7}>
-          <Card>
+          <Card sx={{ marginBottom: 10 }}>
             <Group
               position="apart"
               style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
@@ -133,7 +137,7 @@ export default function About() {
                 <Text size="sm" weight={500} color="gray">
                   Asset Number
                 </Text>
-                <Text size="sm">{data.assetNumber}</Text>
+                <Text size="sm">{data.asset_number}</Text>
               </Col>
               <Col span={3}>
                 <Text size="sm" weight={500}>
@@ -150,6 +154,8 @@ export default function About() {
                 </Badge>
               </Col>
             </Grid>
+          </Card>
+          <Card>
             <Group
               position="apart"
               style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
@@ -192,3 +198,16 @@ export default function About() {
 About.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
+
+// export async function getServerSideProps({ req }) {
+//   const { user } = await supabase.auth.api.getUserByCookie(req);
+//   console.log("ServerSide user:" + user?.id);
+//   if (!user) {
+//     console.log("redirect");
+//     // If no user, redirect to index.
+//     return { props: {}, redirect: { destination: "/", permanent: false } };
+//   }
+
+//   // If there is a user, return it.
+//   return { props: { user } };
+// }

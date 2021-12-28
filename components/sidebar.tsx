@@ -61,7 +61,7 @@ export default function Sidebar({ session }: any) {
     try {
       setLoading(true);
       const user = supabase.auth.user();
-      console.log(user);
+      // console.log(user);
 
       let { data, error, status } = await supabase
         .from("profiles")
@@ -72,7 +72,7 @@ export default function Sidebar({ session }: any) {
       if (error && status !== 406) {
         throw error;
       }
-      console.log(data);
+      // console.log(data);
 
       if (data) {
         setUsername(data.username);

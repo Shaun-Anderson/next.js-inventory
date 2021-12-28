@@ -156,6 +156,7 @@ export function ReactTable<T extends Record<string, unknown>>(
                     {...column.getHeaderProps({
                       ...column.getSortByToggleProps(),
                       style: {
+                        maxWidth: column.maxWidth,
                         minWidth: column.minWidth,
                         width: column.width,
                       },
@@ -201,6 +202,7 @@ export function ReactTable<T extends Record<string, unknown>>(
                         <td
                           {...cell.getCellProps({
                             style: {
+                              maxWidth: cell.column.maxWidth,
                               minWidth: cell.column.minWidth,
                               width: cell.column.width,
                             },
@@ -232,6 +234,7 @@ export function ReactTable<T extends Record<string, unknown>>(
                         <td
                           {...cell.getCellProps({
                             style: {
+                              maxWidth: cell.column.maxWidth,
                               minWidth: cell.column.minWidth,
                               width: cell.column.width,
                             },
