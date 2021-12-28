@@ -12,12 +12,14 @@ import {
   Table,
   TextInput,
   ScrollArea,
-  Text,
   Group,
   Button,
   Divider,
   ActionIcon,
   Loader,
+  Center,
+  Text,
+  LoadingOverlay,
 } from "@mantine/core";
 import {
   ArrowUp,
@@ -138,6 +140,7 @@ export function ReactTable<T extends Record<string, unknown>>(
           overflowY: "hidden",
         }}
       >
+        <LoadingOverlay visible={props.loading} overlayOpacity={0.5} />{" "}
         <Table highlightOnHover={props.selectable} {...getTableProps()}>
           <thead
             style={{
@@ -176,7 +179,7 @@ export function ReactTable<T extends Record<string, unknown>>(
               </tr>
             ))}
           </thead>
-          {props.loading && <Loader />}
+
           {/* <ScrollArea> */}
           <tbody {...getTableBodyProps()}>
             {props.pagination &&

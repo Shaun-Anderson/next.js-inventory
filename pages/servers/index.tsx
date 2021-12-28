@@ -334,6 +334,7 @@ export default function About() {
           searchable
           selectable
           pagination
+          loading={servers == undefined}
           columns={columns}
           onRowClick={(row: Server) => {
             console.log(row);
