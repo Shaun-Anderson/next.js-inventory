@@ -8,36 +8,35 @@ export default function Account({ user }: any) {
   const [website, setWebsite] = useState(null);
   const [avatar_url, setAvatarUrl] = useState(null);
 
-  // useEffect(() => {
-  //   getProfile();
-  // }, [session]);
+  useEffect(() => {
+    getProfile();
+  }, []);
 
-  // async function getProfile() {
-  //   try {
-  //     setLoading(true);
-  //     const user = supabase.auth.user();
-  //     console.log(user);
-  //     let { data, error, status } = await supabase
-  //       .from("profiles")
-  //       .select(`username, website, avatar_url`)
-  //       .eq("id", user.id)
-  //       .single();
+  async function getProfile() {
+    try {
+      setLoading(true);
+      const user = supabase.auth.user();
+      let { data, error, status } = await supabase
+        .from("profiles")
+        .select(`username, website, avatar_url`)
+        .eq("id", user.id)
+        .single();
 
-  //     if (error && status !== 406) {
-  //       throw error;
-  //     }
+      if (error && status !== 406) {
+        throw error;
+      }
 
-  //     if (data) {
-  //       setUsername(data.username);
-  //       setWebsite(data.website);
-  //       setAvatarUrl(data.avatar_url);
-  //     }
-  //   } catch (error) {
-  //     alert(error.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
+      if (data) {
+        setUsername(data.username);
+        setWebsite(data.website);
+        setAvatarUrl(data.avatar_url);
+      }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function updateProfile({ username, website, avatar_url }) {
     try {
@@ -119,8 +118,9 @@ Account.getLayout = function getLayout(page: ReactElement) {
 
 export async function getServerSideProps({ req }) {
   const { user } = await supabase.auth.api.getUserByCookie(req);
-
+  console.log("ServerSide user:" + user?.id);
   if (!user) {
+    console.log("redirect");
     // If no user, redirect to index.
     return { props: {}, redirect: { destination: "/", permanent: false } };
   }

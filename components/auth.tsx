@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
 
 export default function Auth() {
@@ -8,9 +8,27 @@ export default function Auth() {
   const handleLogin = async (email) => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signIn({ email });
+      const { user, session, error } = await supabase.auth.signIn({ email });
+      console.log(session);
       if (error) throw error;
       alert("Check your email for the login link!");
+    } catch (error) {
+      alert(error.error_description || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGitHubLogin = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signIn(
+        {
+          provider: "github",
+        },
+        { redirectTo: "http://localhost:3000/dashboard" }
+      );
+      if (error) throw error;
     } catch (error) {
       alert(error.error_description || error.message);
     } finally {
@@ -43,6 +61,13 @@ export default function Auth() {
           disabled={loading}
         >
           <span>{loading ? "Loading" : "Send magic link"}</span>
+        </button>
+        <button
+          className="mt-4 p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300"
+          onClick={() => handleGitHubLogin()}
+          disabled={loading}
+        >
+          {loading ? "Logging in" : "Login with GitHub"}
         </button>
       </div>
     </main>

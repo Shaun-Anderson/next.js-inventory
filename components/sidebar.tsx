@@ -8,8 +8,15 @@ import {
   Title,
   Avatar,
   Navbar,
+  Divider,
 } from "@mantine/core";
-import { Laptop, HardDrives, Database } from "phosphor-react";
+import {
+  Laptop,
+  HardDrives,
+  Database,
+  House,
+  CaretRight,
+} from "phosphor-react";
 import { useRouter } from "next/router";
 import { createStyles } from "@mantine/core";
 import { supabase } from "../utils/supabaseClient";
@@ -18,7 +25,7 @@ import { NavbarSection } from "@mantine/core/lib/components/AppShell/Navbar/Navb
 
 const useStyles = createStyles((theme) => ({
   button: {
-    color: theme.white,
+    // color: theme.white,
     backgroundColor: theme.colors.white,
     border: 0,
     borderRadius: theme.radius.sm,
@@ -88,9 +95,24 @@ export default function Sidebar({ session }: any) {
       <Navbar.Section grow mt="lg">
         <UnstyledButton
           className={cx(classes.button, {
-            [classes.active]: router.pathname == "/",
+            [classes.active]: router.pathname == "/dashboard",
           })}
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/dashboard")}
+          type="button"
+          style={{ width: "100%" }}
+        >
+          <Group>
+            <ThemeIcon variant="light">
+              <House weight="bold" />
+            </ThemeIcon>
+            <Text size="sm">Dashboard</Text>
+          </Group>
+        </UnstyledButton>
+        <UnstyledButton
+          className={cx(classes.button, {
+            [classes.active]: router.pathname == "/systems",
+          })}
+          onClick={() => router.push("/systems")}
           type="button"
           style={{ width: "100%" }}
         >
@@ -135,14 +157,19 @@ export default function Sidebar({ session }: any) {
         </UnstyledButton>
       </Navbar.Section>
       <Navbar.Section>
+        <Divider my={5} />
         <UnstyledButton
           onClick={() => router.push("/account")}
+          className={classes.button}
           type="button"
           style={{ width: "100%" }}
         >
           <Group>
-            <Avatar>?</Avatar>
-            <Text size="sm">{username}</Text>
+            <Avatar radius="xl">?</Avatar>
+            <Group direction="column" style={{ flex: "1 1 0%" }}>
+              <Text size="sm">{username}</Text>
+            </Group>
+            <CaretRight />
           </Group>
         </UnstyledButton>
       </Navbar.Section>
