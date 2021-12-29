@@ -25,32 +25,45 @@ import Header from "../../components/header";
 import Breadcrumbs from "../../components/breadcrumb";
 import { DatePicker } from "@mantine/dates";
 import { supabase } from "../../utils/supabaseClient";
+import { AsyncSelect } from "../../components/asyncSelect";
+import { useRouter } from "next/router";
 
 type Server = {
   id: number;
   name: string;
   assetNumber: string;
-  location: string;
+  location_id: number;
   datePurchased: Date;
   brand: string;
   model: string;
   serial: string;
   macAddress: string;
 };
-
+type Location = {
+  id: number;
+  name: string;
+};
 export default function About() {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function add(server: Server) {
     setLoading(true);
     const user = supabase.auth.user();
-    await supabase.from("servers").insert({
+
+    console.log(form);
+    const { data, error } = await supabase.from("servers").insert({
       asset_number: server.assetNumber,
       name: server.name,
-      // location: server.location,
+      location_id: server.location_id,
       date_purchased: server.datePurchased,
       user_id: user?.id,
     });
+
+    console.log(data);
+
+    router.push(`/servers/${data[0].id}`);
+
     setLoading(false);
     console.log("Add");
   }
@@ -59,20 +72,30 @@ export default function About() {
       id: 0,
       name: "",
       assetNumber: "",
-      location: "",
+      location_id: 0,
       datePurchased: new Date(),
       brand: "",
       model: "",
       serial: "",
       macAddress: "",
     },
-    // validationRules: {
-    //   assetNumber: (value) => /^\S+@\S+$/.test(value),
-    // },
+    validationRules: {
+      name: (value) => value.trim().length >= 1,
+      assetNumber: (value) => value.trim().length >= 1,
+      location_id: (value) => value != 0,
+      //assetNumber: (value) => /^\S+@\S+$/.test(value),
+    },
+    errorMessages: {
+      name: "Name is required",
+      assetNumber: "Asset Number is required",
+      location_id: "Location is required",
+    },
   });
 
+  console.log(form);
+
   const SelectItem = forwardRef(
-    ({ image, label, description, ...others }, ref) => (
+    ({ name, label, description, ...others }, ref) => (
       <div ref={ref} {...others}>
         <Group noWrap>
           <Avatar src={image} />
@@ -113,13 +136,6 @@ export default function About() {
                 <Col span={3}>
                   <TextInput
                     required
-                    label="Asset Number"
-                    {...form.getInputProps("assetNumber")}
-                  />
-                </Col>
-                <Col span={3}>
-                  <TextInput
-                    required
                     label="Name"
                     {...form.getInputProps("name")}
                   />
@@ -127,8 +143,38 @@ export default function About() {
                 <Col span={3}>
                   <TextInput
                     required
+                    label="Asset Number"
+                    {...form.getInputProps("assetNumber")}
+                  />
+                </Col>
+                <Col span={6}>
+                  <AsyncSelect<Location>
+                    url="locations"
                     label="Location"
-                    {...form.getInputProps("location")}
+                    labelProp="name"
+                    valueProp="id"
+                    required
+                    placeholder="Pick a location"
+                    {...form.getInputProps("location_id")}
+                    rightSection={<Loader size="xs" />}
+                    itemComponent={forwardRef(
+                      ({ name, ...others }: Location, ref) => (
+                        <div ref={ref} {...others}>
+                          <Group noWrap>
+                            <div>
+                              <Text>{name}</Text>
+                            </div>
+                          </Group>
+                        </div>
+                      )
+                    )}
+                    searchable
+                    maxDropdownHeight={400}
+                    filter={(value, item) =>
+                      item.name
+                        .toLowerCase()
+                        .includes(value.toLowerCase().trim())
+                    }
                   />
                 </Col>
                 <Col span={6}>
@@ -145,59 +191,58 @@ export default function About() {
               <Divider my="xs" label="Hardware details" />
               <Grid>
                 <Col span={6}>
-                  <Select
+                  <AsyncSelect<Location>
+                    url="locations"
                     label="Brand"
+                    labelProp="name"
+                    valueProp="id"
                     required
                     placeholder="Pick a brand"
-                    transition="pop-top-left"
-                    transitionDuration={80}
-                    transitionTimingFunction="ease"
                     rightSection={<Loader size="xs" />}
-                    itemComponent={SelectItem}
-                    data={[
-                      {
-                        image:
-                          "https://img.icons8.com/clouds/256/000000/futurama-bender.png",
-                        label: "Bender Bending Rodríguez",
-                        value: "1",
-                        description: "Fascinated with cooking",
-                      },
-                    ]}
+                    itemComponent={forwardRef(
+                      ({ name, ...others }: Location, ref) => (
+                        <div ref={ref} {...others}>
+                          <Group noWrap>
+                            <div>
+                              <Text>{name}</Text>
+                            </div>
+                          </Group>
+                        </div>
+                      )
+                    )}
                     searchable
                     maxDropdownHeight={400}
-                    nothingFound="No data found"
                     filter={(value, item) =>
-                      item.label
-                        .toLowerCase()
-                        .includes(value.toLowerCase().trim()) ||
-                      item.description
+                      item.name
                         .toLowerCase()
                         .includes(value.toLowerCase().trim())
                     }
                   />
                 </Col>
                 <Col span={6}>
-                  <Select
-                    label="Modal"
-                    placeholder="Pick a model"
-                    itemComponent={SelectItem}
-                    data={[
-                      {
-                        image:
-                          "https://img.icons8.com/clouds/256/000000/futurama-bender.png",
-                        label: "Bender Bending Rodríguez",
-                        value: "1",
-                        description: "Fascinated with cooking",
-                      },
-                    ]}
+                  <AsyncSelect<Location>
+                    url="locations"
+                    label="Location"
+                    labelProp="name"
+                    valueProp="id"
+                    required
+                    placeholder="Pick a location"
+                    rightSection={<Loader size="xs" />}
+                    itemComponent={forwardRef(
+                      ({ name, ...others }: Location, ref) => (
+                        <div ref={ref} {...others}>
+                          <Group noWrap>
+                            <div>
+                              <Text>{name}</Text>
+                            </div>
+                          </Group>
+                        </div>
+                      )
+                    )}
                     searchable
                     maxDropdownHeight={400}
-                    nothingFound="No data found"
                     filter={(value, item) =>
-                      item.label
-                        .toLowerCase()
-                        .includes(value.toLowerCase().trim()) ||
-                      item.description
+                      item.name
                         .toLowerCase()
                         .includes(value.toLowerCase().trim())
                     }

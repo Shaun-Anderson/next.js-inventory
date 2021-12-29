@@ -22,11 +22,11 @@ export default function Header({
         <Group>
           {icon && icon}
           <div>
-            {showBreadcumbs && <Breadcrumbs />}
             <Title order={2}>{title}</Title>
             <Text size="xs" color="gray">
               {subTitle}
             </Text>
+            {showBreadcumbs && <Breadcrumbs />}
           </div>
         </Group>
       </Col>
