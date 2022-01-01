@@ -62,6 +62,8 @@ export default function About() {
 
     console.log(data);
 
+    if (error) return setLoading(false);
+
     router.push(`/servers/${data[0].id}`);
 
     setLoading(false);

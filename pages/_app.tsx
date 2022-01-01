@@ -8,6 +8,7 @@ import "regenerator-runtime/runtime";
 import { Auth } from "@supabase/ui";
 import { supabase } from "../utils/supabaseClient";
 import { useRouter } from "next/router";
+import { ModalProvider } from "use-modal-hook";
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -63,10 +64,12 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         colorScheme: "light",
       }}
     >
-      <ModalsProvider>
-        <Auth.UserContextProvider supabaseClient={supabase}>
-          {getLayout(<Component {...pageProps} />)}
-        </Auth.UserContextProvider>
+      <ModalsProvider modalProps={{}}>
+        <ModalProvider>
+          <Auth.UserContextProvider supabaseClient={supabase}>
+            {getLayout(<Component {...pageProps} />)}
+          </Auth.UserContextProvider>
+        </ModalProvider>
       </ModalsProvider>
     </MantineProvider>
   );

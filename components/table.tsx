@@ -1,4 +1,4 @@
-import { ReactElement, PropsWithChildren, useState } from "react";
+import { ReactElement, PropsWithChildren, useState, useCallback } from "react";
 import {
   useTable,
   TableOptions,
@@ -30,6 +30,8 @@ import {
   CaretRight,
   CaretDoubleRight,
 } from "phosphor-react";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 export interface ReactTableProps<T extends Record<string, unknown>>
   extends TableOptions<T> {
@@ -110,6 +112,30 @@ export function ReactTable<T extends Record<string, unknown>>(
     usePagination
   );
 
+  const RenderRow = useCallback(
+    ({ index, style }) => {
+      const row = rows[index];
+      prepareRow(row);
+      return (
+        <div
+          {...row.getRowProps({
+            style,
+          })}
+          className="tr"
+        >
+          {row.cells.map((cell) => {
+            return (
+              <div {...cell.getCellProps()} className="td">
+                {cell.render("Cell")}
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
+    [prepareRow, rows]
+  );
+
   const getPageRecordInfo = () => {
     const firstRowNum = pageIndex * pageSize + 1;
     // const totalRows = serverSideDataSource ? total : rows.length;
@@ -123,15 +149,6 @@ export function ReactTable<T extends Record<string, unknown>>(
   // Render the UI for your table
   return (
     <div>
-      <div>
-        {props.searchable && (
-          <GlobalFilter
-            preGlobalFilteredRows={preGlobalFilteredRows}
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
-        )}
-      </div>
       <div
         style={{
           display: "block",
@@ -140,6 +157,13 @@ export function ReactTable<T extends Record<string, unknown>>(
           overflowY: "hidden",
         }}
       >
+        {props.searchable && (
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
+        )}
         <LoadingOverlay visible={props.loading} overlayOpacity={0.5} />{" "}
         <Table highlightOnHover={props.selectable} {...getTableProps()}>
           <thead
@@ -215,38 +239,54 @@ export function ReactTable<T extends Record<string, unknown>>(
                   </tr>
                 );
               })}
-            {!props.pagination &&
-              rows.map((row, i) => {
-                prepareRow(row);
-                return (
-                  <tr
-                    {...row.getRowProps({
-                      onClick: (e, t) => {
-                        props.onRowClick && props.onRowClick(row.original);
-                      },
-                      style: {
-                        cursor: props.onRowClick ? "pointer" : "default",
-                      },
-                    })}
-                  >
-                    {row.cells.map((cell) => {
-                      return (
-                        <td
-                          {...cell.getCellProps({
-                            style: {
-                              maxWidth: cell.column.maxWidth,
-                              minWidth: cell.column.minWidth,
-                              width: cell.column.width,
-                            },
-                          })}
-                        >
-                          {cell.render("Cell")}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
+            {
+              !props.pagination && (
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <List
+                      className="List"
+                      height={800}
+                      itemCount={rows.length}
+                      itemSize={35}
+                      width={width}
+                    >
+                      {RenderRow}
+                    </List>
+                  )}
+                </AutoSizer>
+              )
+              // rows.map((row, i) => {
+              //   prepareRow(row);
+              //   return (
+              //     <tr
+              //       {...row.getRowProps({
+              //         onClick: (e, t) => {
+              //           props.onRowClick && props.onRowClick(row.original);
+              //         },
+              //         style: {
+              //           cursor: props.onRowClick ? "pointer" : "default",
+              //         },
+              //       })}
+              //     >
+              //       {row.cells.map((cell) => {
+              //         return (
+              //           <td
+              //             {...cell.getCellProps({
+              //               style: {
+              //                 maxWidth: cell.column.maxWidth,
+              //                 minWidth: cell.column.minWidth,
+              //                 width: cell.column.width,
+              //               },
+              //             })}
+              //           >
+              //             {cell.render("Cell")}
+              //           </td>
+              //         );
+              //       })}
+              //     </tr>
+              //   );
+              // }
+            }
           </tbody>
           {/* </ScrollArea> */}
         </Table>

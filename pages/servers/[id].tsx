@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { memo, ReactElement, useState } from "react";
 import Layout from "../../components/layout";
 import {
   Button,
@@ -12,6 +12,11 @@ import {
   Col,
   Progress,
   Loader,
+  TextInput,
+  NumberInput,
+  Select,
+  Space,
+  Modal,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
@@ -23,17 +28,18 @@ import { useRouter } from "next/router";
 import { supabase } from "../../utils/supabaseClient";
 import useSWR from "swr";
 import { getServer } from "../api/server";
+import { useModal } from "use-modal-hook";
 
 type Server = {
   id: number;
+  name: string;
   assetNumber: string;
-  status: string;
-  location: string;
+  location_id: number;
+  datePurchased: Date;
   brand: string;
   model: string;
   serial: string;
   macAddress: string;
-  storage?: Storage[];
 };
 
 type Storage = {
@@ -48,11 +54,82 @@ type Storage = {
 
 export default function About() {
   const router = useRouter();
+  const modals = useModals();
   const theme = useMantineTheme();
   const { id } = router.query;
   // if (!id) {
   //   return <Loader />;
   // }
+
+  const MyModal = memo(
+    ({ isOpen, onClose, title, description, closeBtnLabel }) => {
+      const form = useForm<Storage>({
+        initialValues: {
+          id: 0,
+          brand: "",
+          model: "",
+          capacity: 0,
+          capacityClassification: "",
+          driveClassification: "",
+          driveName: "",
+        },
+        validationRules: {
+          brand: (value) => value.trim().length >= 1,
+          capacityClassification: (value) => value.trim().length >= 1,
+          capacity: (value) => value != 0,
+        },
+      });
+      return (
+        <Modal
+          title={title}
+          opened={isOpen}
+          onClose={onClose}
+          overlayOpacity={0.5}
+          centered
+        >
+          <form onSubmit={form.onSubmit((values) => console.log(values))}>
+            <Group grow>
+              <TextInput label="Drive" />
+
+              <TextInput
+                label="Capacity"
+                type="number"
+                required
+                {...form.getInputProps("capacity")}
+                rightSectionWidth={100}
+                rightSection={
+                  <Select
+                    required
+                    placeholder="Pick one"
+                    {...form.getInputProps("capacityClassification")}
+                    data={[
+                      { value: "mb", label: "MB" },
+                      { value: "gb", label: "GB" },
+                      { value: "tb", label: "TB" },
+                    ]}
+                  />
+                }
+              />
+            </Group>
+            <Group grow>
+              <TextInput label="Brand" {...form.getInputProps("brand")} />
+              <TextInput label="Model" />
+            </Group>
+            <Space />
+            <Button type="submit" fullWidth>
+              Submit
+            </Button>
+          </form>
+        </Modal>
+      );
+    }
+  );
+  const [showModal, hideModal] = useModal(MyModal, {
+    title: "Add Storage",
+    description: "I Like React Hooks",
+    closeBtnLabel: "Close",
+  });
+
   console.log(`ID: ${id}`);
   const { data, error } = useSWR(id, getServer);
   console.log(data, error);
@@ -122,7 +199,7 @@ export default function About() {
       />
       <Grid>
         <Col span={7}>
-          <Card sx={{ marginBottom: 10 }}>
+          <Card shadow="sm" withBorder sx={{ marginBottom: 10 }}>
             <Group
               position="apart"
               style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
@@ -161,7 +238,12 @@ export default function About() {
               style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
             >
               <Text weight={500}>Storage</Text>
-              <Button type="button" size="xs" variant="light">
+              <Button
+                type="button"
+                size="xs"
+                variant="light"
+                onClick={showModal}
+              >
                 Add
               </Button>
             </Group>
