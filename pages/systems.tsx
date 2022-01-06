@@ -6,6 +6,10 @@ import { ReactTable } from "../components/table";
 import { Database, HardDrives, Plus } from "phosphor-react";
 import Link from "next/link";
 import Header from "../components/header";
+import DocViewer, {
+  DocViewerRenderers,
+  IHeaderOverride,
+} from "react-doc-viewer";
 
 type Server = {
   id: number;
@@ -17,51 +21,39 @@ type Server = {
 };
 
 export default function About() {
-  const columns = [
-    {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
-      Header: "Asset Number",
-      accessor: "assetNumber",
-    },
-    {
-      Header: "Brand",
-      accessor: "brand",
-    },
-    {
-      Header: "Model",
-      accessor: "model",
-    },
+  const docs = [
+    { uri: "/test.pdf" },
+    // {
+    //   uri: "https://www.americanexpress.com/content/dam/amex/us/staticassets/pdf/GCO/Test_PDF.pdf",
+    //   fileType: "pdf",
+    // },
   ];
 
-  const data: Server[] = [
-    {
-      id: 1,
-      assetNumber: "Test #1",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-    },
-    {
-      id: 2,
-      assetNumber: "Test #2",
-      brand: "Lenovo",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-    },
-  ];
+  const myHeader: IHeaderOverride = (state, previousDocument, nextDocument) => {
+    if (!state.currentDocument || state.config?.header?.disableFileName) {
+      return null;
+    }
+
+    return (
+      <>
+        <div>{state.currentDocument.uri || ""}</div>
+        <div>
+          <button
+            onClick={previousDocument}
+            disabled={state.currentFileNo === 0}
+          >
+            Previous Document
+          </button>
+          <button
+            onClick={nextDocument}
+            disabled={state.currentFileNo >= state.documents.length - 1}
+          >
+            Next Document
+          </button>
+        </div>
+      </>
+    );
+  };
 
   return (
     <section
@@ -88,7 +80,16 @@ export default function About() {
           </Link>
         }
       />
-      <ReactTable<Server> data={data} columns={columns} />
+      <DocViewer
+        pluginRenderers={DocViewerRenderers}
+        documents={docs}
+        style={{ width: "100%", height: "100%" }}
+        config={{
+          header: {
+            overrideComponent: myHeader,
+          },
+        }}
+      />
     </section>
   );
 }
