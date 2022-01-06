@@ -19,11 +19,19 @@ import { useForm, useForceUpdate } from "@mantine/hooks";
 import useSWR from "swr";
 import Link from "next/link";
 import Header from "../components/header";
-import { Trash, Pencil, Plus, HardDrives, GitBranch } from "phosphor-react";
+import {
+  Trash,
+  Pencil,
+  Plus,
+  HardDrives,
+  GitBranch,
+  Database,
+} from "phosphor-react";
 import { useRouter } from "next/router";
 import Breadcrumbs from "../components/breadcrumb";
 import { supabase } from "../utils/supabaseClient";
 import { getServers } from "./api/server";
+import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 
 type Server = {
   id: number;
@@ -298,8 +306,8 @@ export default function About() {
     >
       <Header
         icon={
-          <ThemeIcon size="lg" color="pink" variant="light">
-            <HardDrives weight="bold" />
+          <ThemeIcon size="lg" color="teal" variant="light">
+            <Database weight="bold" />
           </ThemeIcon>
         }
         title="Databases"
