@@ -36,6 +36,7 @@ type Server = {
   name: string;
   asset_number: string;
   status: string;
+  location_id: number;
   location: string;
   brand: string;
   model: string;
@@ -72,7 +73,17 @@ const DeleteModal = memo(
       >
         <LoadingOverlay visible={loading} />
         <form onSubmit={form.onSubmit((values) => submit(values))}>
-          <Button type="submit" fullWidth>
+          <Group>
+            <Text>{description}</Text>
+          </Group>
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="light"
+            color="red"
+            sx={{ marginTop: 10 }}
+          >
             Submit
           </Button>
         </form>
@@ -125,7 +136,17 @@ const StatusModal = memo(
       >
         <LoadingOverlay visible={loading} />
         <form onSubmit={form.onSubmit((values) => submit(values))}>
-          <Group grow>
+          <Group>
+            <Text
+              size="sm"
+              sx={(theme) => ({
+                color: theme.colors.gray[5],
+              })}
+            >
+              {description}
+            </Text>
+          </Group>
+          <Group grow sx={{ marginTop: 10 }}>
             <Select
               required
               placeholder="Pick one"
@@ -168,14 +189,14 @@ export default function About() {
 
   const [showStatusModal, hideStatusModal] = useModal(StatusModal, {
     title: "Update Server Status",
-    description: "Sele",
+    description: "Update Status",
     data: undefined,
     onSubmit: async (server: Server) => {
-      console.log(servers?.map((el) => (el.id === server.id ? server : el)));
       await mutate(servers?.map((el) => (el.id === server.id ? server : el)));
       hideStatusModal();
     },
   });
+
   if (error) <p>Loading failed...</p>;
   if (!servers) <h1>Loading...</h1>;
   if (servers == undefined) <h1>Loading...</h1>;
@@ -184,6 +205,7 @@ export default function About() {
     {
       Header: "Server",
       id: "server",
+      accessor: "name",
       minWidth: 200,
       Cell: (data: any) => (
         <Group spacing="5px" direction="column">
@@ -230,6 +252,12 @@ export default function About() {
     {
       Header: "Model",
       accessor: "model",
+    },
+
+    {
+      Header: "Location",
+      accessor: "location.name",
+      minWidth: 200,
     },
     // {
     //   Header: "Network",
@@ -296,160 +324,6 @@ export default function About() {
     },
   ];
 
-  const [data, setData] = useState<Server[]>([
-    {
-      id: 1,
-      assetNumber: "Test #1",
-      name: "Hades",
-      status: "online",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 2,
-      assetNumber: "Test #2",
-      name: "Zues",
-      status: "online",
-      brand: "Lenovo",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      name: "Posiden",
-      status: "online",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      name: "Hades",
-
-      status: "online",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      status: "online",
-      name: "Hades",
-
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      status: "online",
-      name: "Hades",
-
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      status: "online",
-      name: "Hades",
-
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      status: "online",
-      name: "Hades",
-
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      status: "online",
-      name: "Hades",
-
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      status: "online",
-      name: "Hades",
-
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      model: "Test Model",
-      status: "online",
-      name: "Hades",
-
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-  ]);
-
   return (
     <section
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
@@ -476,20 +350,17 @@ export default function About() {
         }
       />
       <Card sx={{ display: "block", overflowY: "auto" }}>
-        {/* <div style={{ overflow: "hidden" }}> */}
         <ReactTable<Server>
           data={servers ?? []}
           searchable
           selectable
-          pagination
+          // pagination
           loading={servers == undefined}
           columns={columns}
           onRowClick={(row: Server) => {
-            console.log(row);
             router.push(`/servers/${row.id}`);
           }}
         />
-        {/* </div> */}
       </Card>
     </section>
   );
