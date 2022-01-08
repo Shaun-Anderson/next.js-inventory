@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { memo, ReactElement, useEffect, useState } from "react";
 import Layout from "../../components/layout";
 import {
   Button,
@@ -12,6 +12,10 @@ import {
   Menu,
   Divider,
   Badge,
+  Modal,
+  Select,
+  Space,
+  LoadingOverlay,
 } from "@mantine/core";
 import { ReactTable } from "../../components/table";
 import { useModals } from "@mantine/modals";
@@ -24,6 +28,8 @@ import { useRouter } from "next/router";
 import Breadcrumbs from "../../components/breadcrumb";
 import { supabase } from "../../utils/supabaseClient";
 import { getServers } from "../api/server";
+import { useModal } from "use-modal-hook";
+import { ServerStyles } from "@mantine/next";
 
 type Server = {
   id: number;
@@ -39,13 +45,64 @@ type Server = {
   port: number;
 };
 
+const DeleteModal = memo(
+  ({ isOpen, onClose, title, description, closeBtnLabel, data, onSubmit }) => {
+    console.log(data);
+    const form = useForm<Server>({
+      initialValues: data,
+    });
+    const [loading, setLoading] = useState(false);
+    async function submit(server: Server) {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("servers")
+        .delete()
+        .match({ id: server.id });
+      if (error) return setLoading(false);
+      onSubmit(server);
+      setLoading(false);
+      console.log("Add");
+    }
+    return (
+      <Modal
+        title={title}
+        opened={isOpen}
+        onClose={onClose}
+        overlayOpacity={0.5}
+        centered
+      >
+        <LoadingOverlay visible={loading} />
+        <form onSubmit={form.onSubmit((values) => submit(values))}>
+          <Button type="submit" fullWidth>
+            Submit
+          </Button>
+        </form>
+      </Modal>
+    );
+  }
+);
+
 export default function About() {
   const router = useRouter();
-  const { data: servers, error } = useSWR("api/server", getServers);
+  const {
+    data: servers,
+    mutate,
+    error,
+  } = useSWR<Server[]>("api/server", getServers);
+  const [showModal, hideModal] = useModal(DeleteModal, {
+    title: "Delete Server",
+    description: "Are you sure you want to delete this server?",
+    closeBtnLabel: "Close",
+    data: undefined,
+    onSubmit: async (server: Server) => {
+      await mutate(servers?.filter((x) => x.id != server.id));
+      hideModal();
+    },
+  });
   if (error) <p>Loading failed...</p>;
   if (!servers) <h1>Loading...</h1>;
   if (servers == undefined) <h1>Loading...</h1>;
-  console.log(servers);
+
   const columns = [
     {
       Header: "Server",
@@ -102,7 +159,7 @@ export default function About() {
       id: "col13",
       minWidth: 120,
       maxWidth: 120,
-      Cell: () => (
+      Cell: (data: any) => (
         <Group spacing="5px">
           <Menu
             onClick={(e: any) => {
@@ -113,7 +170,11 @@ export default function About() {
             <Menu.Item icon={<GitBranch />}>Change Status</Menu.Item>
             <Menu.Item icon={<GitBranch />}>Move Locations</Menu.Item>
             <Divider />
-            <Menu.Item color="red" icon={<Trash />}>
+            <Menu.Item
+              color="red"
+              icon={<Trash />}
+              onClick={() => showModal({ data: data.row.original })}
+            >
               Delete
             </Menu.Item>
           </Menu>
@@ -129,7 +190,10 @@ export default function About() {
           <ActionIcon
             color="red"
             variant="light"
-            onClick={(e: any) => e.stopPropagation()}
+            onClick={(e: any) => {
+              e.stopPropagation();
+              showModal({ data: data.row.original });
+            }}
           >
             <Trash />
           </ActionIcon>
