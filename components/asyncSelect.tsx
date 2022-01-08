@@ -65,6 +65,7 @@ export function AsyncSelect<T extends Record<string, unknown>>(
       defaultValue={props.defaultValue}
       placeholder={props.placeholder}
       transition="pop-top-left"
+      fullWidth
       transitionDuration={80}
       transitionTimingFunction="ease"
       rightSection={loading ? <Loader size="xs" /> : null}

@@ -17,12 +17,13 @@ import {
   Select,
   Space,
   Modal,
+  ThemeIcon,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
 import Link from "next/link";
 import Header from "../../components/header";
-import { Trash, Pencil, Plus } from "phosphor-react";
+import { Trash, Pencil, Plus, Package, Article } from "phosphor-react";
 import { ReactTable } from "../../components/table";
 import { useRouter } from "next/router";
 import { supabase } from "../../utils/supabaseClient";
@@ -170,73 +171,39 @@ export default function About() {
 
   return (
     <section>
-      <Header
-        title={data.asset_number}
-        showBreadcumbs
-        // subTitle={data.serial}
-        rightArea={
-          <Link href="servers/add">
-            <Button
-              component="a"
-              variant="light"
-              color="yellow"
-              leftIcon={<Plus weight="bold" />}
-            >
-              Edit Server
-            </Button>
-          </Link>
-        }
-      />
+      <Header title={data.name} showBreadcumbs />
       <Grid>
-        <Col span={7}>
-          <Card shadow="sm" withBorder sx={{ marginBottom: 10 }}>
-            <Group
-              position="apart"
-              style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
-            >
-              <Text weight="bold">Details</Text>
-              <Badge color="pink" variant="light">
+        <Col span={4}>
+          <Card padding="sm">
+            <Group position="apart" sx={{ marginBottom: 10 }}>
+              <Group>
+                <ThemeIcon color="gray" variant="light">
+                  <Article weight="bold" />
+                </ThemeIcon>
+                <Text weight={500}>Details</Text>
+              </Group>
+              <Button
+                type="button"
+                size="xs"
+                variant="light"
+                color="yellow"
+                onClick={showModal}
+              >
                 Edit
-              </Badge>
+              </Button>
             </Group>
             <Grid>
-              <Col span={3}>
+              <Col span={12}>
                 <Text size="sm" weight={500} color="gray">
-                  Asset Number
+                  Name
                 </Text>
-                <Text size="sm">{data.asset_number}</Text>
-              </Col>
-              <Col span={3}>
-                <Text size="sm" weight={500}>
-                  Location
-                </Text>
-                <Text size="sm">{data.location}</Text>
-              </Col>
-              <Col span={3}>
-                <Text size="sm" weight={500}>
-                  Status
-                </Text>
-                <Badge size="sm" color="green">
-                  {data.status}
-                </Badge>
+                <Text size="sm">{data.name}</Text>
               </Col>
             </Grid>
           </Card>
-          <ItemTable />
         </Col>
-        <Col span={5}>
-          <Card>
-            <Group
-              position="apart"
-              style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
-            >
-              <Text weight={500}>Notes</Text>
-              <Button type="button" variant="light">
-                Add
-              </Button>
-            </Group>
-            <Card.Section>Test</Card.Section>
-          </Card>
+        <Col span={8}>
+          <ItemTable />
         </Col>
       </Grid>
     </section>

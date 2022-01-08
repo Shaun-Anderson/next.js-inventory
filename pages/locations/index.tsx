@@ -88,6 +88,13 @@ const AddModal = memo(
       initialValues: {
         id: 0,
         name: "",
+        user_id: "",
+      },
+      validationRules: {
+        name: (value) => value.trim().length >= 1,
+      },
+      errorMessages: {
+        name: "Name is required",
       },
     });
     const [loading, setLoading] = useState(false);
@@ -124,11 +131,7 @@ const AddModal = memo(
             </Text>
           </Group>
           <Group grow sx={{ marginTop: 10 }}>
-            <TextInput
-              required
-              placeholder="Name"
-              {...form.getInputProps("name")}
-            />
+            <TextInput required label="Name" {...form.getInputProps("name")} />
           </Group>
           <Space />
           <Button type="submit" fullWidth>
@@ -160,8 +163,8 @@ export default function About() {
   });
 
   const [showAddModal, hideAddModal] = useModal(AddModal, {
-    title: "Update Server Status",
-    description: "Update Status",
+    title: "Add Location",
+    description: "Add a new location",
     data: undefined,
     onSubmit: async (item: Location) => {
       await mutate([...(locations ?? []), item]);

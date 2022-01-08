@@ -15,6 +15,8 @@ import {
   Space,
   LoadingOverlay,
   Loader,
+  Col,
+  Grid,
 } from "@mantine/core";
 import { ReactTable } from "../../components/table";
 import { useForm } from "@mantine/hooks";
@@ -189,35 +191,38 @@ const LocationModal = memo(
               {description}
             </Text>
           </Group>
-          <Group grow sx={{ marginTop: 10 }}>
-            <AsyncSelect<Location>
-              url="locations"
-              label="Location"
-              labelProp="name"
-              valueProp="id"
-              required
-              defaultValue="Test"
-              placeholder="Pick a location"
-              {...form.getInputProps("location_id")}
-              rightSection={<Loader size="xs" />}
-              itemComponent={forwardRef(
-                ({ name, ...others }: Location, ref) => (
-                  <div ref={ref} {...others}>
-                    <Group noWrap>
-                      <div>
-                        <Text>{name}</Text>
-                      </div>
-                    </Group>
-                  </div>
-                )
-              )}
-              searchable
-              maxDropdownHeight={400}
-              filter={(value, item) =>
-                item.name.toLowerCase().includes(value.toLowerCase().trim())
-              }
-            />
-          </Group>
+          <Grid>
+            <Col span={12}>
+              <AsyncSelect<Location>
+                url="locations"
+                label="Location"
+                labelProp="name"
+                valueProp="id"
+                required
+                defaultValue="Test"
+                placeholder="Pick a location"
+                {...form.getInputProps("location_id")}
+                rightSection={<Loader size="xs" />}
+                itemComponent={forwardRef(
+                  ({ name, ...others }: Location, ref) => (
+                    <div ref={ref} {...others}>
+                      <Group noWrap>
+                        <div>
+                          <Text>{name}</Text>
+                        </div>
+                      </Group>
+                    </div>
+                  )
+                )}
+                searchable
+                maxDropdownHeight={400}
+                filter={(value, item) =>
+                  item.name.toLowerCase().includes(value.toLowerCase().trim())
+                }
+              />
+            </Col>
+          </Grid>
+          <Group grow sx={{ marginTop: 10 }}></Group>
           <Space />
           <Button type="submit" fullWidth>
             Submit

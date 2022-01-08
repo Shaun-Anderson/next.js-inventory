@@ -19,12 +19,13 @@ import {
   Modal,
   Divider,
   Menu,
+  ThemeIcon,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
 import Link from "next/link";
 import Header from "../../components/header";
-import { Trash, Pencil, Plus, GitBranch } from "phosphor-react";
+import { MapPin, Package } from "phosphor-react";
 import { ReactTable } from "../../components/table";
 import { useRouter } from "next/router";
 import { supabase } from "../../utils/supabaseClient";
@@ -119,12 +120,14 @@ export default function ItemTable() {
   if (!data) return <Loader />;
 
   return (
-    <Card>
-      <Group
-        position="apart"
-        style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
-      >
-        <Text weight={500}>Items</Text>
+    <Card sx={{ padding: 0 }}>
+      <Group position="apart" style={{ margin: 10 }}>
+        <Group>
+          <ThemeIcon color="indigo" variant="light">
+            <Package weight="bold" />
+          </ThemeIcon>
+          <Text weight={500}>Items</Text>
+        </Group>
         <Button type="button" size="xs" variant="light" onClick={showModal}>
           Add
         </Button>
