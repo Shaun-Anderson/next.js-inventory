@@ -9,6 +9,9 @@ import {
   Avatar,
   Navbar,
   Divider,
+  useMantineColorScheme,
+  ActionIcon,
+  Space,
 } from "@mantine/core";
 import {
   Laptop,
@@ -17,6 +20,8 @@ import {
   House,
   CaretRight,
   Package,
+  Moon,
+  Sun,
 } from "phosphor-react";
 import { useRouter } from "next/router";
 import { createStyles } from "@mantine/core";
@@ -57,6 +62,8 @@ export default function Sidebar({ session }: any) {
     getProfile();
   }, [session]);
 
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
   async function getProfile() {
     try {
       setLoading(true);
@@ -96,6 +103,10 @@ export default function Sidebar({ session }: any) {
           <Title order={2} sx={{ padding: 10 }}>
             Inventory
           </Title>
+          <Space />
+          <ActionIcon onClick={() => toggleColorScheme()}>
+            {colorScheme == "light" ? <Sun /> : <Moon />}
+          </ActionIcon>
         </Group>
       </Navbar.Section>
       <Navbar.Section grow mt="lg">

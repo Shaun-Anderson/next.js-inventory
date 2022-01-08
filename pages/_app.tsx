@@ -1,8 +1,12 @@
 import "../styles/globals.css";
-import { ReactElement, ReactNode, useEffect } from "react";
+import { ReactElement, ReactNode, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
-import { MantineProvider } from "@mantine/core";
+import {
+  ColorScheme,
+  ColorSchemeProvider,
+  MantineProvider,
+} from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import "regenerator-runtime/runtime";
 import { Auth } from "@supabase/ui";
@@ -54,23 +58,29 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       authListener.unsubscribe();
     };
   }, []);
-
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("light");
+  const toggleColorScheme = (value?: ColorScheme) =>
+    setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
   return (
-    <MantineProvider
-      withGlobalStyles
-      withNormalizeCSS
-      theme={{
-        /** Put your mantine theme override here */
-        colorScheme: "light",
-      }}
+    <ColorSchemeProvider
+      colorScheme={colorScheme}
+      toggleColorScheme={toggleColorScheme}
     >
-      <ModalsProvider modalProps={{}}>
-        <ModalProvider>
-          <Auth.UserContextProvider supabaseClient={supabase}>
-            {getLayout(<Component {...pageProps} />)}
-          </Auth.UserContextProvider>
-        </ModalProvider>
-      </ModalsProvider>
-    </MantineProvider>
+      <MantineProvider
+        withGlobalStyles
+        withNormalizeCSS
+        theme={{
+          colorScheme,
+        }}
+      >
+        <ModalsProvider modalProps={{}}>
+          <ModalProvider>
+            <Auth.UserContextProvider supabaseClient={supabase}>
+              {getLayout(<Component {...pageProps} />)}
+            </Auth.UserContextProvider>
+          </ModalProvider>
+        </ModalsProvider>
+      </MantineProvider>
+    </ColorSchemeProvider>
   );
 }
