@@ -4,7 +4,14 @@ export async function getServers() {
   const user = supabase.auth.user();
   const { data: posts, error } = await supabase
     .from("servers")
-    .select("*")
+    .select(
+      `
+    *,
+    location:location_id (
+      *
+    )
+  `
+    )
     .eq("user_id", user?.id);
 
   if (error) throw error.message;
