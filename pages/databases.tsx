@@ -31,7 +31,6 @@ import { useRouter } from "next/router";
 import Breadcrumbs from "../components/breadcrumb";
 import { supabase } from "../utils/supabaseClient";
 import { getServers } from "./api/server";
-import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 
 type Server = {
   id: number;
@@ -58,6 +57,7 @@ export default function About() {
     {
       Header: "Server",
       id: "server",
+      accessor: "name",
       minWidth: 200,
       Cell: (data: any) => (
         <Group spacing="5px" direction="column">
@@ -82,6 +82,18 @@ export default function About() {
                 {data.row.original.status}
               </Badge>
             );
+          case "offline":
+            return (
+              <Badge size="sm" color="gray">
+                {data.row.original.status}
+              </Badge>
+            );
+          case "maintenance":
+            return (
+              <Badge size="sm" color="yellow">
+                {data.row.original.status}
+              </Badge>
+            );
         }
       },
     },
@@ -92,6 +104,12 @@ export default function About() {
     {
       Header: "Model",
       accessor: "model",
+    },
+
+    {
+      Header: "Location",
+      accessor: "location.name",
+      minWidth: 200,
     },
     // {
     //   Header: "Network",
@@ -110,7 +128,7 @@ export default function About() {
       id: "col13",
       minWidth: 120,
       maxWidth: 120,
-      Cell: () => (
+      Cell: (data: any) => (
         <Group spacing="5px">
           <Menu
             onClick={(e: any) => {
@@ -118,10 +136,19 @@ export default function About() {
             }}
           >
             <Menu.Label>Actions</Menu.Label>
-            <Menu.Item icon={<GitBranch />}>Change Status</Menu.Item>
+            <Menu.Item
+              icon={<GitBranch />}
+              onClick={() => showStatusModal({ data: data.row.original })}
+            >
+              Change Status
+            </Menu.Item>
             <Menu.Item icon={<GitBranch />}>Move Locations</Menu.Item>
             <Divider />
-            <Menu.Item color="red" icon={<Trash />}>
+            <Menu.Item
+              color="red"
+              icon={<Trash />}
+              onClick={() => showModal({ data: data.row.original })}
+            >
               Delete
             </Menu.Item>
           </Menu>
@@ -137,7 +164,10 @@ export default function About() {
           <ActionIcon
             color="red"
             variant="light"
-            onClick={(e: any) => e.stopPropagation()}
+            onClick={(e: any) => {
+              e.stopPropagation();
+              showModal({ data: data.row.original });
+            }}
           >
             <Trash />
           </ActionIcon>
@@ -145,161 +175,6 @@ export default function About() {
       ),
     },
   ];
-
-  const [data, setData] = useState<Server[]>([
-    {
-      id: 1,
-      assetNumber: "Test #1",
-      name: "Hades",
-      status: "online",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 2,
-      assetNumber: "Test #2",
-      name: "Zues",
-      status: "online",
-      brand: "Lenovo",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      name: "Posiden",
-      status: "online",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      name: "Hades",
-
-      status: "online",
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      status: "online",
-      name: "Hades",
-
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      status: "online",
-      name: "Hades",
-
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      status: "online",
-      name: "Hades",
-
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      status: "online",
-      name: "Hades",
-
-      brand: "Microsoft",
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      status: "online",
-      name: "Hades",
-
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      status: "online",
-      name: "Hades",
-
-      model: "Test Model",
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-    {
-      id: 3,
-      assetNumber: "Test #3",
-      brand: "Microsoft",
-      model: "Test Model",
-      status: "online",
-      name: "Hades",
-
-      serial: "00000001",
-      macAddress: "1234",
-      ipAddress: "192.100.1.202",
-      port: 4000,
-      location: "Building B",
-    },
-  ]);
-
   return (
     <section
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
@@ -325,20 +200,8 @@ export default function About() {
           </Link>
         }
       />
-      <Card sx={{ display: "block", overflowY: "auto" }}>
-        {/* <div style={{ overflow: "hidden" }}> */}
-        <ReactTable<Server>
-          data={servers ?? []}
-          searchable
-          selectable
-          loading={servers == undefined}
-          columns={columns}
-          onRowClick={(row: Server) => {
-            console.log(row);
-            router.push(`/servers/${row.id}`);
-          }}
-        />
-        {/* </div> */}
+      <Card sx={{ display: "block" }}>
+        <div style={{ height: "100%" }}></div>
       </Card>
     </section>
   );
