@@ -52,7 +52,12 @@ export const Breadcrumbs = () => {
       {breadcrumbs.map((breadcrumb, i) => {
         if (i == breadcrumbs.length - 1)
           return (
-            <Text key={i} size="xs" color="gray" sx={{ lineHeight: 1 }}>
+            <Text
+              key={i}
+              size="xs"
+              color="gray"
+              sx={{ lineHeight: 1, alignSelf: "center" }}
+            >
               {convertBreadcrumb(breadcrumb.breadcrumb)}
             </Text>
           );
