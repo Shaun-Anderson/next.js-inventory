@@ -7,6 +7,7 @@ import {
   useMantineTheme,
   Text,
 } from "@mantine/core";
+import { CaretRight } from "phosphor-react";
 
 interface Path {
   breadcumb: string;
@@ -48,7 +49,14 @@ export const Breadcrumbs = () => {
   }
 
   return (
-    <Base>
+    <Base
+      separator={<CaretRight weight="bold" />}
+      sx={(theme) => ({
+        "& .mantine-Breadcrumbs-separator": {
+          fontSize: 12,
+        },
+      })}
+    >
       {breadcrumbs.map((breadcrumb, i) => {
         if (i == breadcrumbs.length - 1)
           return (
