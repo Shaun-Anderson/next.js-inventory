@@ -61,7 +61,6 @@ const DeleteModal = memo(
       if (error) return setLoading(false);
       onSubmit(server);
       setLoading(false);
-      console.log("Add");
     }
     return (
       <Modal
@@ -82,6 +81,72 @@ const DeleteModal = memo(
   }
 );
 
+interface ModalProps<T> {
+  title: string;
+  description?: string;
+  isOpen: boolean;
+  onClose?: () => void;
+  onSubmit?: (data: T) => void;
+  data: T;
+}
+
+const StatusModal = memo(
+  ({
+    isOpen,
+    onClose,
+    title,
+    description,
+    data,
+    onSubmit,
+  }: ModalProps<Server>) => {
+    console.log(data);
+    const form = useForm<Server>({
+      initialValues: data,
+    });
+    const [loading, setLoading] = useState(false);
+    async function submit(server: Server) {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("servers")
+        .update({ status: server.status })
+        .match({ id: server.id });
+      console.log(data);
+      if (error) return setLoading(false);
+      if (onSubmit) onSubmit(server);
+      setLoading(false);
+    }
+    return (
+      <Modal
+        title={title}
+        opened={isOpen}
+        onClose={onClose}
+        overlayOpacity={0.5}
+        centered
+      >
+        <LoadingOverlay visible={loading} />
+        <form onSubmit={form.onSubmit((values) => submit(values))}>
+          <Group grow>
+            <Select
+              required
+              placeholder="Pick one"
+              {...form.getInputProps("status")}
+              data={[
+                { value: "online", label: "Online" },
+                { value: "offline", label: "Offline" },
+                { value: "maintenance", label: "Maintenance" },
+              ]}
+            />
+          </Group>
+          <Space />
+          <Button type="submit" fullWidth>
+            Submit
+          </Button>
+        </form>
+      </Modal>
+    );
+  }
+);
+
 export default function About() {
   const router = useRouter();
   const {
@@ -89,6 +154,7 @@ export default function About() {
     mutate,
     error,
   } = useSWR<Server[]>("api/server", getServers);
+
   const [showModal, hideModal] = useModal(DeleteModal, {
     title: "Delete Server",
     description: "Are you sure you want to delete this server?",
@@ -97,6 +163,17 @@ export default function About() {
     onSubmit: async (server: Server) => {
       await mutate(servers?.filter((x) => x.id != server.id));
       hideModal();
+    },
+  });
+
+  const [showStatusModal, hideStatusModal] = useModal(StatusModal, {
+    title: "Update Server Status",
+    description: "Sele",
+    data: undefined,
+    onSubmit: async (server: Server) => {
+      console.log(servers?.map((el) => (el.id === server.id ? server : el)));
+      await mutate(servers?.map((el) => (el.id === server.id ? server : el)));
+      hideStatusModal();
     },
   });
   if (error) <p>Loading failed...</p>;
@@ -128,6 +205,18 @@ export default function About() {
           case "online":
             return (
               <Badge size="sm" color="green">
+                {data.row.original.status}
+              </Badge>
+            );
+          case "offline":
+            return (
+              <Badge size="sm" color="gray">
+                {data.row.original.status}
+              </Badge>
+            );
+          case "maintenance":
+            return (
+              <Badge size="sm" color="yellow">
                 {data.row.original.status}
               </Badge>
             );
@@ -167,7 +256,12 @@ export default function About() {
             }}
           >
             <Menu.Label>Actions</Menu.Label>
-            <Menu.Item icon={<GitBranch />}>Change Status</Menu.Item>
+            <Menu.Item
+              icon={<GitBranch />}
+              onClick={() => showStatusModal({ data: data.row.original })}
+            >
+              Change Status
+            </Menu.Item>
             <Menu.Item icon={<GitBranch />}>Move Locations</Menu.Item>
             <Divider />
             <Menu.Item
