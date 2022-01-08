@@ -24,6 +24,7 @@ interface AsyncSelectProps<T> {
   searchable: boolean;
   maxDropdownHeight?: number;
   filter: (value: string, item: SelectItem) => boolean;
+  defaultValue?: string;
 }
 export function AsyncSelect<T extends Record<string, unknown>>(
   props: AsyncSelectProps<T>
@@ -61,6 +62,7 @@ export function AsyncSelect<T extends Record<string, unknown>>(
       label={props.label}
       required={props.required}
       onChange={props.onChange}
+      defaultValue={props.defaultValue}
       placeholder={props.placeholder}
       transition="pop-top-left"
       transitionDuration={80}
