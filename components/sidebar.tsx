@@ -22,6 +22,7 @@ import {
   Package,
   Moon,
   Sun,
+  MapPin,
 } from "phosphor-react";
 import { useRouter } from "next/router";
 import { createStyles } from "@mantine/core";
@@ -96,11 +97,11 @@ export default function Sidebar({ session }: any) {
   return (
     <Navbar width={{ base: 300 }} height={"100%"} padding="xs">
       <Navbar.Section style={{ padding: "10px" }}>
-        <Group spacing="5px">
+        <Group spacing="5px" sx={{ display: "flex" }}>
           <ThemeIcon size="lg" variant="light">
             <Package size={24} weight="bold" />
           </ThemeIcon>
-          <Title order={2} sx={{ padding: 10 }}>
+          <Title order={2} sx={{ padding: 10, flexGrow: 1 }}>
             Inventory
           </Title>
           <Space />
@@ -170,6 +171,22 @@ export default function Sidebar({ session }: any) {
               <Database weight="bold" />
             </ThemeIcon>
             <Text size="sm">Databases</Text>
+          </Group>
+        </UnstyledButton>
+
+        <UnstyledButton
+          className={cx(classes.button, {
+            [classes.active]: router.pathname == "/locations",
+          })}
+          onClick={() => router.push("/locations")}
+          type="button"
+          style={{ width: "100%" }}
+        >
+          <Group>
+            <ThemeIcon color="indigo" variant="light">
+              <MapPin weight="bold" />
+            </ThemeIcon>
+            <Text size="sm">Locations</Text>
           </Group>
         </UnstyledButton>
       </Navbar.Section>
