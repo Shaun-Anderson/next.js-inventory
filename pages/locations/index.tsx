@@ -1,36 +1,27 @@
-import { memo, ReactElement, useEffect, useState } from "react";
+import { memo, ReactElement, useState } from "react";
 import Layout from "../../components/layout";
 import {
   Button,
-  ActionIcon,
-  Grid,
   Text,
-  TextInput,
   Group,
   ThemeIcon,
   Card,
-  Menu,
-  Divider,
-  Badge,
   Modal,
   Select,
   Space,
   LoadingOverlay,
+  TextInput,
 } from "@mantine/core";
 import { ReactTable } from "../../components/table";
-import { useModals } from "@mantine/modals";
-import { useForm, useForceUpdate } from "@mantine/hooks";
+import { useForm } from "@mantine/hooks";
 import useSWR from "swr";
-import Link from "next/link";
 import Header from "../../components/header";
-import { Trash, Pencil, Plus, HardDrives, MapPin } from "phosphor-react";
+import { Plus, MapPin } from "phosphor-react";
 import { useRouter } from "next/router";
-import Breadcrumbs from "../../components/breadcrumb";
 import { supabase } from "../../utils/supabaseClient";
-import { getServers } from "../api/server";
 import { useModal } from "use-modal-hook";
-import { ServerStyles } from "@mantine/next";
 import { getLocations } from "../api/location";
+import { ModalProps } from "../../types/ModalProps";
 
 type Location = {
   id: number;
@@ -84,7 +75,7 @@ const DeleteModal = memo(
   }
 );
 
-const StatusModal = memo(
+const AddModal = memo(
   ({
     isOpen,
     onClose,
@@ -92,21 +83,24 @@ const StatusModal = memo(
     description,
     data,
     onSubmit,
-  }: ModalProps<Server>) => {
-    console.log(data);
-    const form = useForm<Server>({
-      initialValues: data,
+  }: ModalProps<Location>) => {
+    const form = useForm<Location>({
+      initialValues: {
+        id: 0,
+        name: "",
+      },
     });
     const [loading, setLoading] = useState(false);
-    async function submit(server: Server) {
+    async function submit(item: Location) {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("servers")
-        .update({ status: server.status })
-        .match({ id: server.id });
+      const user = supabase.auth.user();
+      const { data, error } = await supabase.from("locations").insert({
+        name: item.name,
+        user_id: user?.id,
+      });
       console.log(data);
       if (error) return setLoading(false);
-      if (onSubmit) onSubmit(server);
+      if (onSubmit) onSubmit(item);
       setLoading(false);
     }
     return (
@@ -130,15 +124,10 @@ const StatusModal = memo(
             </Text>
           </Group>
           <Group grow sx={{ marginTop: 10 }}>
-            <Select
+            <TextInput
               required
-              placeholder="Pick one"
-              {...form.getInputProps("status")}
-              data={[
-                { value: "online", label: "Online" },
-                { value: "offline", label: "Offline" },
-                { value: "maintenance", label: "Maintenance" },
-              ]}
+              placeholder="Name"
+              {...form.getInputProps("name")}
             />
           </Group>
           <Space />
@@ -170,13 +159,13 @@ export default function About() {
     },
   });
 
-  const [showStatusModal, hideStatusModal] = useModal(StatusModal, {
+  const [showAddModal, hideAddModal] = useModal(AddModal, {
     title: "Update Server Status",
     description: "Update Status",
     data: undefined,
-    onSubmit: async (server: Server) => {
-      await mutate(servers?.map((el) => (el.id === server.id ? server : el)));
-      hideStatusModal();
+    onSubmit: async (item: Location) => {
+      await mutate([...(locations ?? []), item]);
+      hideAddModal();
     },
   });
 
@@ -197,16 +186,15 @@ export default function About() {
         title="Locations"
         subTitle="On-site locations"
         rightArea={
-          <Link href="locations/add">
-            <Button
-              component="a"
-              variant="light"
-              color="cyan"
-              leftIcon={<Plus weight="bold" />}
-            >
-              Add Server
-            </Button>
-          </Link>
+          <Button
+            component="a"
+            variant="light"
+            color="blue"
+            leftIcon={<Plus weight="bold" />}
+            onClick={() => showAddModal()}
+          >
+            Add Location
+          </Button>
         }
       />
       <Card sx={{ display: "block", overflowY: "auto" }}>

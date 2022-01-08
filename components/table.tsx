@@ -266,6 +266,7 @@ export function ReactTable<T extends Record<string, unknown>>(
                 );
               })}
           </tbody>
+          {rows.length === 0 && !props.loading && <span>no data....</span>}
           {/* </ScrollArea> */}
         </Table>
       </div>

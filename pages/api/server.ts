@@ -18,6 +18,18 @@ export async function getServers() {
   return posts;
 }
 
+export async function getServerForLocation(api: string, location_id: number) {
+  const user = supabase.auth.user();
+  console.log(location_id);
+  const { data: posts, error } = await supabase
+    .from("servers")
+    .select("*")
+    .eq("location_id", location_id)
+    .eq("user_id", user?.id);
+  if (error) throw error.message;
+  return posts;
+}
+
 export async function getServer(id: number) {
   const user = supabase.auth.user();
   console.log(id);

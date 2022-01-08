@@ -29,6 +29,8 @@ import { supabase } from "../../utils/supabaseClient";
 import useSWR from "swr";
 import { getServer } from "../api/server";
 import { useModal } from "use-modal-hook";
+import ItemTable from "../../components/locations/itemTable";
+import { getLocation } from "../api/location";
 
 type Server = {
   id: number;
@@ -130,20 +132,8 @@ export default function About() {
     closeBtnLabel: "Close",
   });
 
-  console.log(`ID: ${id}`);
-  const { data, error } = useSWR(id, getServer);
+  const { data, error } = useSWR(id, getLocation);
   console.log(data, error);
-  const [storageData, setStorageData] = useState<Storage[]>([
-    {
-      id: 1,
-      driveClassification: "D",
-      driveName: "Shared",
-      brand: "Kensinton",
-      model: "1",
-      capacity: 100,
-      capacityClassification: "GB",
-    },
-  ]);
 
   if (error) return <p>Loading failed...</p>;
   if (!data) return <Loader />;
@@ -232,31 +222,7 @@ export default function About() {
               </Col>
             </Grid>
           </Card>
-          <Card>
-            <Group
-              position="apart"
-              style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
-            >
-              <Text weight={500}>Storage</Text>
-              <Button
-                type="button"
-                size="xs"
-                variant="light"
-                onClick={showModal}
-              >
-                Add
-              </Button>
-            </Group>
-            <Progress
-              size="xl"
-              sections={[
-                { value: 40, color: "cyan" },
-                { value: 15, color: "orange" },
-                { value: 15, color: "grape" },
-              ]}
-            />
-            <ReactTable data={storageData} columns={columns} />
-          </Card>
+          <ItemTable />
         </Col>
         <Col span={5}>
           <Card>

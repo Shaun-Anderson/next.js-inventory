@@ -30,18 +30,6 @@ import useSWR from "swr";
 import { getServer } from "../api/server";
 import { useModal } from "use-modal-hook";
 
-type Server = {
-  id: number;
-  name: string;
-  assetNumber: string;
-  location_id: number;
-  datePurchased: Date;
-  brand: string;
-  model: string;
-  serial: string;
-  macAddress: string;
-};
-
 type Storage = {
   id: number;
   driveClassification: string;

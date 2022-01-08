@@ -1,15 +1,12 @@
 import { ReactElement, forwardRef, useState } from "react";
 import Layout from "../../components/layout";
-import Sidebar from "../../components/sidebar";
 import {
   Button,
-  Title,
   Grid,
   Col,
   TextInput,
   Text,
   Group,
-  Select,
   Avatar,
   Loader,
   Card,
@@ -17,32 +14,16 @@ import {
   Center,
   LoadingOverlay,
 } from "@mantine/core";
-import { ReactTable } from "../../components/table";
-import { useModals } from "@mantine/modals";
-import { useForm, useForceUpdate } from "@mantine/hooks";
+import { useForm } from "@mantine/hooks";
 import Link from "next/link";
 import Header from "../../components/header";
-import Breadcrumbs from "../../components/breadcrumb";
 import { DatePicker } from "@mantine/dates";
 import { supabase } from "../../utils/supabaseClient";
 import { AsyncSelect } from "../../components/asyncSelect";
 import { useRouter } from "next/router";
+import { Server } from "../../types/Server";
+import { Location } from "../../types/Location";
 
-type Server = {
-  id: number;
-  name: string;
-  assetNumber: string;
-  location_id: number;
-  datePurchased: Date;
-  brand: string;
-  model: string;
-  serial: string;
-  macAddress: string;
-};
-type Location = {
-  id: number;
-  name: string;
-};
 export default function About() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -53,10 +34,10 @@ export default function About() {
 
     console.log(form);
     const { data, error } = await supabase.from("servers").insert({
-      asset_number: server.assetNumber,
+      asset_number: server.asset_number,
       name: server.name,
       location_id: server.location_id,
-      date_purchased: server.datePurchased,
+      date_purchased: server.data_purchased,
       user_id: user?.id,
     });
 
@@ -73,9 +54,9 @@ export default function About() {
     initialValues: {
       id: 0,
       name: "",
-      assetNumber: "",
+      asset_number: "",
       location_id: 0,
-      datePurchased: new Date(),
+      date_purchased: new Date(),
       brand: "",
       model: "",
       serial: "",
@@ -83,13 +64,13 @@ export default function About() {
     },
     validationRules: {
       name: (value) => value.trim().length >= 1,
-      assetNumber: (value) => value.trim().length >= 1,
+      asset_number: (value) => value.trim().length >= 1,
       location_id: (value) => value != 0,
       //assetNumber: (value) => /^\S+@\S+$/.test(value),
     },
     errorMessages: {
       name: "Name is required",
-      assetNumber: "Asset Number is required",
+      asset_number: "Asset Number is required",
       location_id: "Location is required",
     },
   });
@@ -146,7 +127,7 @@ export default function About() {
                   <TextInput
                     required
                     label="Asset Number"
-                    {...form.getInputProps("assetNumber")}
+                    {...form.getInputProps("asset_number")}
                   />
                 </Col>
                 <Col span={6}>
@@ -185,7 +166,7 @@ export default function About() {
                     placeholder="Purchased date"
                     label="Purchased Date"
                     required
-                    {...form.getInputProps("datePurchased")}
+                    {...form.getInputProps("date_purchased")}
                   />
                 </Col>
               </Grid>

@@ -1,11 +1,9 @@
-import { memo, ReactElement, useEffect, useState } from "react";
+import { forwardRef, memo, ReactElement, useState } from "react";
 import Layout from "../../components/layout";
 import {
   Button,
   ActionIcon,
-  Grid,
   Text,
-  TextInput,
   Group,
   ThemeIcon,
   Card,
@@ -16,35 +14,22 @@ import {
   Select,
   Space,
   LoadingOverlay,
+  Loader,
 } from "@mantine/core";
 import { ReactTable } from "../../components/table";
-import { useModals } from "@mantine/modals";
-import { useForm, useForceUpdate } from "@mantine/hooks";
+import { useForm } from "@mantine/hooks";
 import useSWR from "swr";
 import Link from "next/link";
 import Header from "../../components/header";
 import { Trash, Pencil, Plus, HardDrives, GitBranch } from "phosphor-react";
 import { useRouter } from "next/router";
-import Breadcrumbs from "../../components/breadcrumb";
 import { supabase } from "../../utils/supabaseClient";
 import { getServers } from "../api/server";
 import { useModal } from "use-modal-hook";
-import { ServerStyles } from "@mantine/next";
-
-type Server = {
-  id: number;
-  name: string;
-  asset_number: string;
-  status: string;
-  location_id: number;
-  location: string;
-  brand: string;
-  model: string;
-  serial: string;
-  mac_address: string;
-  ip_address: string;
-  port: number;
-};
+import { ModalProps } from "../../types/ModalProps";
+import { Server } from "../../types/Server";
+import { AsyncSelect } from "../../components/asyncSelect";
+import { Location } from "../../types/Location";
 
 const DeleteModal = memo(
   ({ isOpen, onClose, title, description, closeBtnLabel, data, onSubmit }) => {
@@ -91,15 +76,6 @@ const DeleteModal = memo(
     );
   }
 );
-
-interface ModalProps<T> {
-  title: string;
-  description?: string;
-  isOpen: boolean;
-  onClose?: () => void;
-  onSubmit?: (data: T) => void;
-  data: T;
-}
 
 const StatusModal = memo(
   ({
@@ -168,6 +144,90 @@ const StatusModal = memo(
   }
 );
 
+const LocationModal = memo(
+  ({
+    isOpen,
+    onClose,
+    title,
+    description,
+    data,
+    onSubmit,
+  }: ModalProps<Server>) => {
+    console.log(data);
+    const form = useForm<Server>({
+      initialValues: data,
+    });
+    const [loading, setLoading] = useState(false);
+    async function submit(server: Server) {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("servers")
+        .update({ location_id: server.location_id })
+        .match({ id: server.id });
+      console.log(data);
+      if (error) return setLoading(false);
+      if (onSubmit) onSubmit(server);
+      setLoading(false);
+    }
+    return (
+      <Modal
+        title={title}
+        opened={isOpen}
+        onClose={onClose}
+        overlayOpacity={0.5}
+        centered
+      >
+        <LoadingOverlay visible={loading} />
+        <form onSubmit={form.onSubmit((values) => submit(values))}>
+          <Group>
+            <Text
+              size="sm"
+              sx={(theme) => ({
+                color: theme.colors.gray[5],
+              })}
+            >
+              {description}
+            </Text>
+          </Group>
+          <Group grow sx={{ marginTop: 10 }}>
+            <AsyncSelect<Location>
+              url="locations"
+              label="Location"
+              labelProp="name"
+              valueProp="id"
+              required
+              defaultValue="Test"
+              placeholder="Pick a location"
+              {...form.getInputProps("location_id")}
+              rightSection={<Loader size="xs" />}
+              itemComponent={forwardRef(
+                ({ name, ...others }: Location, ref) => (
+                  <div ref={ref} {...others}>
+                    <Group noWrap>
+                      <div>
+                        <Text>{name}</Text>
+                      </div>
+                    </Group>
+                  </div>
+                )
+              )}
+              searchable
+              maxDropdownHeight={400}
+              filter={(value, item) =>
+                item.name.toLowerCase().includes(value.toLowerCase().trim())
+              }
+            />
+          </Group>
+          <Space />
+          <Button type="submit" fullWidth>
+            Submit
+          </Button>
+        </form>
+      </Modal>
+    );
+  }
+);
+
 export default function About() {
   const router = useRouter();
   const {
@@ -194,6 +254,16 @@ export default function About() {
     onSubmit: async (server: Server) => {
       await mutate(servers?.map((el) => (el.id === server.id ? server : el)));
       hideStatusModal();
+    },
+  });
+
+  const [showLocationModal, hideLocationModal] = useModal(LocationModal, {
+    title: "Update Location",
+    description: "Update Location",
+    data: undefined,
+    onSubmit: async (server: Server) => {
+      await mutate(servers?.map((el) => (el.id === server.id ? server : el)));
+      hideLocationModal();
     },
   });
 
@@ -290,7 +360,12 @@ export default function About() {
             >
               Change Status
             </Menu.Item>
-            <Menu.Item icon={<GitBranch />}>Move Locations</Menu.Item>
+            <Menu.Item
+              icon={<GitBranch />}
+              onClick={() => showLocationModal({ data: data.row.original })}
+            >
+              Move Locations
+            </Menu.Item>
             <Divider />
             <Menu.Item
               color="red"
