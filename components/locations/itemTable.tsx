@@ -116,8 +116,8 @@ export default function ItemTable() {
     [`api/location/${id}`, id],
     getServerForLocation
   );
-  if (error) return <p>Loading failed...</p>;
-  if (!data) return <Loader />;
+  //if (error) return <p>Loading failed...</p>;
+  //if (!data) return <Loader />;
 
   return (
     <Card sx={{ padding: 0 }}>
@@ -134,6 +134,7 @@ export default function ItemTable() {
       </Group>
       <ReactTable
         data={data ?? []}
+        loading={data == undefined}
         columns={[
           {
             Header: "Server",
