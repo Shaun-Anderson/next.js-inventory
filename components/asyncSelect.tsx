@@ -25,6 +25,8 @@ interface AsyncSelectProps<T> {
   maxDropdownHeight?: number;
   filter: (value: string, item: SelectItem) => boolean;
   defaultValue?: string;
+  creatable: boolean;
+  onCreate?: (item: string) => void;
 }
 export function AsyncSelect<T extends Record<string, unknown>>(
   props: AsyncSelectProps<T>
@@ -76,6 +78,9 @@ export function AsyncSelect<T extends Record<string, unknown>>(
       maxDropdownHeight={props.maxDropdownHeight}
       nothingFound="No data found"
       filter={props.filter}
+      creatable={props.creatable}
+      getCreateLabel={(query) => `+ Create ${query}`}
+      onCreate={(query) => (props.onCreate ? props.onCreate(query) : null)}
     />
   );
 }
