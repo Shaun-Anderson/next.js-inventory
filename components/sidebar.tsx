@@ -30,29 +30,31 @@ import { supabase } from "../utils/supabaseClient";
 import { useEffect, useState } from "react";
 import { NavbarSection } from "@mantine/core/lib/components/AppShell/Navbar/NavbarSection/NavbarSection";
 
-const useStyles = createStyles((theme) => ({
-  button: {
-    // color: theme.white,
-    backgroundColor: theme.colors.white,
-    border: 0,
-    borderRadius: theme.radius.sm,
-    padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
-    cursor: "pointer",
-    //margin: theme.spacing.xs,
-
-    // Use pseudo-classes just like you would in Sass
-    "&:hover": {
-      backgroundColor: theme.colors.gray[0],
-    },
-  },
-  active: {
-    backgroundColor: theme.colors.gray[1],
-    color: theme.white,
-  },
-}));
-
 export default function Sidebar({ session }: any) {
   const router = useRouter();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const useStyles = createStyles((theme) => ({
+    button: {
+      // color: theme.white,
+      backgroundColor: theme.colors.white,
+      border: 0,
+      borderRadius: theme.radius.sm,
+      padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
+      cursor: "pointer",
+      //margin: theme.spacing.xs,
+
+      // Use pseudo-classes just like you would in Sass
+      "&:hover&:not(.active)": {
+        backgroundColor:
+          colorScheme === "light" ? theme.colors.gray[0] : theme.colors.gray[9],
+      },
+    },
+    active: {
+      backgroundColor:
+        colorScheme === "light" ? theme.colors.gray[1] : theme.colors.gray[8],
+      color: theme.white,
+    },
+  }));
   const { classes, cx } = useStyles();
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
@@ -62,8 +64,6 @@ export default function Sidebar({ session }: any) {
   useEffect(() => {
     getProfile();
   }, [session]);
-
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   async function getProfile() {
     try {

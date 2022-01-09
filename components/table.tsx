@@ -55,7 +55,6 @@ function GlobalFilter({
       sx={{
         position: "sticky",
         top: 0,
-        backgroundColor: "white",
       }}
     >
       <TextInput
