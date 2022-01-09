@@ -5,7 +5,7 @@ export type Server = {
   status: string;
   location_id: number;
   location: string;
-  brand: string;
+  brand_id: string;
   model: string;
   serial: string;
   mac_address: string;
