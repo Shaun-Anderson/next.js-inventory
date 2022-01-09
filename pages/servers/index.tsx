@@ -322,7 +322,7 @@ export default function About() {
     },
     {
       Header: "Brand",
-      accessor: "brand",
+      accessor: "brand.name",
     },
     {
       Header: "Model",
