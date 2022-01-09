@@ -16,6 +16,7 @@ import {
   ActionIcon,
   Text,
   LoadingOverlay,
+  Box,
 } from "@mantine/core";
 import {
   ArrowUp,
@@ -25,6 +26,7 @@ import {
   CaretDoubleLeft,
   CaretRight,
   CaretDoubleRight,
+  Warning,
 } from "phosphor-react";
 
 export interface ReactTableProps<T extends Record<string, unknown>>
@@ -142,7 +144,7 @@ export function ReactTable<T extends Record<string, unknown>>(
 
   // Render the UI for your table
   return (
-    <div>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       {props.searchable && (
         <GlobalFilter
           preGlobalFilteredRows={preGlobalFilteredRows}
@@ -150,198 +152,215 @@ export function ReactTable<T extends Record<string, unknown>>(
           setGlobalFilter={setGlobalFilter}
         />
       )}
-      <div
-        style={{
-          display: "block",
-          maxWidth: "100%",
-          overflowX: "scroll",
-          overflowY: "hidden",
-        }}
-      >
-        <LoadingOverlay visible={props.loading} overlayOpacity={0.5} />{" "}
-        <Table highlightOnHover={props.selectable} {...getTableProps()}>
-          <thead
-            style={{
-              position: "sticky",
-              top: 0,
-              backgroundColor: "white",
-            }}
-          >
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th
-                    {...column.getHeaderProps({
-                      ...column.getSortByToggleProps(),
-                      style: {
-                        maxWidth: column.maxWidth,
-                        minWidth: column.minWidth,
-                        width: column.width,
-                      },
-                    })}
-                  >
-                    {column.render("Header")}
-                    {/* Add a sort direction indicator */}
-                    <span>
-                      {column.isSorted ? (
-                        column.isSortedDesc ? (
-                          <ArrowDown />
+      <div style={{ overflow: "hidden" }}>
+        <div
+          style={{
+            display: "block",
+            maxWidth: "100%",
+            height: "100%",
+            overflowX: "scroll",
+          }}
+        >
+          <LoadingOverlay visible={props.loading} overlayOpacity={0.5} />{" "}
+          <Table highlightOnHover={props.selectable} {...getTableProps()}>
+            <thead
+              style={{
+                position: "sticky",
+                top: 0,
+                backgroundColor: "white",
+              }}
+            >
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      {...column.getHeaderProps({
+                        ...column.getSortByToggleProps(),
+                        style: {
+                          maxWidth: column.maxWidth,
+                          minWidth: column.minWidth,
+                          width: column.width,
+                        },
+                      })}
+                    >
+                      {column.render("Header")}
+                      {/* Add a sort direction indicator */}
+                      <span>
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <ArrowDown />
+                          ) : (
+                            <ArrowUp />
+                          )
                         ) : (
-                          <ArrowUp />
-                        )
-                      ) : (
-                        ""
-                      )}
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
+                          ""
+                        )}
+                      </span>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
 
-          {/* <ScrollArea> */}
-          <tbody {...getTableBodyProps()}>
-            {props.pagination &&
-              page.map((row, i) => {
-                prepareRow(row);
-                return (
-                  <tr
-                    {...row.getRowProps({
-                      onClick: (e, t) => {
-                        props.onRowClick && props.onRowClick(row.original);
-                      },
-                      style: {
-                        cursor: props.onRowClick ? "pointer" : "default",
-                      },
-                    })}
-                  >
-                    {row.cells.map((cell) => {
-                      return (
-                        <td
-                          {...cell.getCellProps({
-                            style: {
-                              maxWidth: cell.column.maxWidth,
-                              minWidth: cell.column.minWidth,
-                              width: cell.column.width,
-                            },
-                          })}
-                        >
-                          {cell.render("Cell")}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
+            {/* <ScrollArea> */}
+            <tbody {...getTableBodyProps()}>
+              {props.pagination &&
+                page.map((row, i) => {
+                  prepareRow(row);
+                  return (
+                    <tr
+                      {...row.getRowProps({
+                        onClick: (e, t) => {
+                          props.onRowClick && props.onRowClick(row.original);
+                        },
+                        style: {
+                          cursor: props.onRowClick ? "pointer" : "default",
+                        },
+                      })}
+                    >
+                      {row.cells.map((cell) => {
+                        return (
+                          <td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                                minWidth: cell.column.minWidth,
+                                width: cell.column.width,
+                              },
+                            })}
+                          >
+                            {cell.render("Cell")}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              {!props.pagination &&
+                rows.map((row, i) => {
+                  prepareRow(row);
+                  return (
+                    <tr
+                      {...row.getRowProps({
+                        onClick: (e, t) => {
+                          props.onRowClick && props.onRowClick(row.original);
+                        },
+                        style: {
+                          cursor: props.onRowClick ? "pointer" : "default",
+                        },
+                      })}
+                    >
+                      {row.cells.map((cell) => {
+                        return (
+                          <td
+                            {...cell.getCellProps({
+                              style: {
+                                maxWidth: cell.column.maxWidth,
+                                minWidth: cell.column.minWidth,
+                                width: cell.column.width,
+                              },
+                            })}
+                          >
+                            {cell.render("Cell")}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+            </tbody>
+
+            {/* </ScrollArea> */}
+          </Table>
+          {rows.length === 0 && !props.loading && (
+            <Box
+              sx={(theme) => ({
+                padding: 10,
+                display: "flex",
+                justifyContent: "center",
+                backgroundColor: theme.colors.gray[1],
               })}
-            {!props.pagination &&
-              rows.map((row, i) => {
-                prepareRow(row);
-                return (
-                  <tr
-                    {...row.getRowProps({
-                      onClick: (e, t) => {
-                        props.onRowClick && props.onRowClick(row.original);
-                      },
-                      style: {
-                        cursor: props.onRowClick ? "pointer" : "default",
-                      },
-                    })}
-                  >
-                    {row.cells.map((cell) => {
-                      return (
-                        <td
-                          {...cell.getCellProps({
-                            style: {
-                              maxWidth: cell.column.maxWidth,
-                              minWidth: cell.column.minWidth,
-                              width: cell.column.width,
-                            },
-                          })}
-                        >
-                          {cell.render("Cell")}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-          </tbody>
-          {rows.length === 0 && !props.loading && <span>no data....</span>}
-          {/* </ScrollArea> */}
-        </Table>
-      </div>
-      {/* 
+            >
+              <Warning color="gray" style={{ marginRight: 5 }} />
+              <Text size="xs" color="gray">
+                No data
+              </Text>
+            </Box>
+          )}
+        </div>
+        {/* 
         Pagination can be built however you'd like. 
         This is just a very basic UI implementation:
       */}
-      {props.pagination && (
-        <div
-          style={{
-            position: "sticky",
-            bottom: 0,
-            backgroundColor: "white",
-            paddingTop: 5,
-          }}
-        >
-          <Group spacing="5px">
-            <ActionIcon
-              variant="light"
-              onClick={() => gotoPage(0)}
-              disabled={!canPreviousPage}
-            >
-              <CaretDoubleLeft weight="bold" />
-            </ActionIcon>
-            <ActionIcon
-              variant="light"
-              onClick={() => previousPage()}
-              disabled={!canPreviousPage}
-            >
-              <CaretLeft weight="bold" />
-            </ActionIcon>
-            <ActionIcon
-              variant="light"
-              onClick={() => nextPage()}
-              disabled={!canNextPage}
-            >
-              <CaretRight weight="bold" />
-            </ActionIcon>
-            <ActionIcon
-              variant="light"
-              onClick={() => gotoPage(pageCount - 1)}
-              disabled={!canNextPage}
-            >
-              <CaretDoubleRight weight="bold" />
-            </ActionIcon>
-            <Divider orientation="vertical" mx="sm" />
+        {props.pagination && (
+          <div
+            style={{
+              position: "sticky",
+              bottom: 0,
+              backgroundColor: "white",
+              paddingTop: 5,
+            }}
+          >
+            <Group spacing="5px">
+              <ActionIcon
+                variant="light"
+                onClick={() => gotoPage(0)}
+                disabled={!canPreviousPage}
+              >
+                <CaretDoubleLeft weight="bold" />
+              </ActionIcon>
+              <ActionIcon
+                variant="light"
+                onClick={() => previousPage()}
+                disabled={!canPreviousPage}
+              >
+                <CaretLeft weight="bold" />
+              </ActionIcon>
+              <ActionIcon
+                variant="light"
+                onClick={() => nextPage()}
+                disabled={!canNextPage}
+              >
+                <CaretRight weight="bold" />
+              </ActionIcon>
+              <ActionIcon
+                variant="light"
+                onClick={() => gotoPage(pageCount - 1)}
+                disabled={!canNextPage}
+              >
+                <CaretDoubleRight weight="bold" />
+              </ActionIcon>
+              <Divider orientation="vertical" mx="sm" />
 
-            <Text size="sm">
-              Page{" "}
-              <strong>
-                {pageIndex + 1} of {pageOptions.length}
-              </strong>{" "}
-            </Text>
-            <Divider orientation="vertical" mx="sm" />
+              <Text size="sm">
+                Page{" "}
+                <strong>
+                  {pageIndex + 1} of {pageOptions.length}
+                </strong>{" "}
+              </Text>
+              <Divider orientation="vertical" mx="sm" />
 
-            <Text size="sm">{getPageRecordInfo()}</Text>
-            <Divider orientation="vertical" mx="sm" />
-            <Text size="sm">Rows per page:</Text>
-            <Select
-              value={pageSize.toString()}
-              style={{ width: "72px" }}
-              onChange={(e) => {
-                setPageSize(Number(e));
-              }}
-              data={[
-                { value: "10", label: "10" },
-                { value: "20", label: "20" },
-                { value: "30", label: "30" },
-                { value: "40", label: "40" },
-                { value: "50", label: "50" },
-              ]}
-            />
-          </Group>
-        </div>
-      )}
+              <Text size="sm">{getPageRecordInfo()}</Text>
+              <Divider orientation="vertical" mx="sm" />
+              <Text size="sm">Rows per page:</Text>
+              <Select
+                value={pageSize.toString()}
+                style={{ width: "72px" }}
+                onChange={(e) => {
+                  setPageSize(Number(e));
+                }}
+                data={[
+                  { value: "10", label: "10" },
+                  { value: "20", label: "20" },
+                  { value: "30", label: "30" },
+                  { value: "40", label: "40" },
+                  { value: "50", label: "50" },
+                ]}
+              />
+            </Group>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
