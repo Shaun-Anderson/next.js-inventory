@@ -23,6 +23,7 @@ import { AsyncSelect } from "../../components/asyncSelect";
 import { useRouter } from "next/router";
 import { Server } from "../../types/Server";
 import { Location } from "../../types/Location";
+import { Brand } from "../../types/Brand";
 
 export default function About() {
   const [loading, setLoading] = useState(false);
@@ -31,18 +32,14 @@ export default function About() {
   async function add(server: Server) {
     setLoading(true);
     const user = supabase.auth.user();
-
-    console.log(form);
     const { data, error } = await supabase.from("servers").insert({
       asset_number: server.asset_number,
       name: server.name,
+      brand_id: server.brand_id,
       location_id: server.location_id,
       date_purchased: server.data_purchased,
       user_id: user?.id,
     });
-
-    console.log(data);
-
     if (error) return setLoading(false);
 
     router.push(`/servers/${data[0].id}`);
@@ -50,6 +47,17 @@ export default function About() {
     setLoading(false);
     console.log("Add");
   }
+
+  async function addBrand(name: string) {
+    const user = supabase.auth.user();
+    const { data, error } = await supabase.from("brands").insert({
+      name: name,
+      user_id: user?.id,
+    });
+    if (error) return setLoading(false);
+    console.log("Added brand: " + data[0].name);
+  }
+
   const form = useForm<Server>({
     initialValues: {
       id: 0,
@@ -57,7 +65,7 @@ export default function About() {
       asset_number: "",
       location_id: 0,
       date_purchased: new Date(),
-      brand: "",
+      brand_id: 0,
       model: "",
       serial: "",
       macAddress: "",
@@ -66,12 +74,14 @@ export default function About() {
       name: (value) => value.trim().length >= 1,
       asset_number: (value) => value.trim().length >= 1,
       location_id: (value) => value != 0,
+      brand_id: (value) => value != 0,
       //assetNumber: (value) => /^\S+@\S+$/.test(value),
     },
     errorMessages: {
       name: "Name is required",
       asset_number: "Asset Number is required",
       location_id: "Location is required",
+      brand_id: "Location is required",
     },
   });
 
@@ -174,8 +184,9 @@ export default function About() {
               <Divider my="xs" label="Hardware details" />
               <Grid>
                 <Col span={6}>
-                  <AsyncSelect<Location>
-                    url="locations"
+                  <AsyncSelect<Brand>
+                    {...form.getInputProps("brand_id")}
+                    url="brands"
                     label="Brand"
                     labelProp="name"
                     valueProp="id"
@@ -194,6 +205,8 @@ export default function About() {
                       )
                     )}
                     searchable
+                    creatable
+                    onCreate={(item) => addBrand(item)}
                     maxDropdownHeight={400}
                     filter={(value, item) =>
                       item.name
