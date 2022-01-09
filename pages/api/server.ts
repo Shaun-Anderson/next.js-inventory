@@ -7,11 +7,13 @@ export async function getServers() {
     .select(
       `
     *,
+    brand: brand_id(*),
     location:location_id (
       *
     )
   `
     )
+    .order("id")
     .eq("user_id", user?.id);
 
   if (error) throw error.message;
