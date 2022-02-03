@@ -33,8 +33,10 @@ export default function Layout({ children }) {
         navbar={<Sidebar session={session} />}
         styles={(theme) => ({
           main: {
-            paddingTop: "34px",
+            // paddingTop: "34px",
+            paddingTop: "20px",
             width: "calc(100vw - 300px)",
+            overflowY: "auto",
             backgroundColor:
               theme.colorScheme === "dark"
                 ? theme.colors.dark[8]
