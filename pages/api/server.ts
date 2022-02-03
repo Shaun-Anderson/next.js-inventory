@@ -37,7 +37,15 @@ export async function getServer(id: number) {
   console.log(id);
   const { data: posts, error } = await supabase
     .from("servers")
-    .select("*")
+    .select(
+      `
+    *,
+    brand: brand_id(*),
+    location:location_id (
+      *
+    )
+  `
+    )
     .eq("id", id)
     .eq("user_id", user?.id)
     .limit(1)
