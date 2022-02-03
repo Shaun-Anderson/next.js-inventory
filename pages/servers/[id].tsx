@@ -1,4 +1,4 @@
-import { memo, ReactElement, useState } from "react";
+import { memo, ReactElement, ReactNode, useState } from "react";
 import Layout from "../../components/layout";
 import {
   Button,
@@ -17,12 +17,15 @@ import {
   Select,
   Space,
   Modal,
+  Divider,
+  ThemeIcon,
+  Box,
 } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { useForm, useForceUpdate } from "@mantine/hooks";
 import Link from "next/link";
 import Header from "../../components/header";
-import { Trash, Pencil, Plus } from "phosphor-react";
+import { Trash, Pencil, Plus, Article } from "phosphor-react";
 import { ReactTable } from "../../components/table";
 import { useRouter } from "next/router";
 import { supabase } from "../../utils/supabaseClient";
@@ -136,6 +139,27 @@ export default function About() {
   if (error) return <p>Loading failed...</p>;
   if (!data) return <Loader />;
 
+  const DetailInfo = (title: string, value: ReactNode) => (
+    <div>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingTop: 10,
+          paddingBottom: 10,
+        }}
+      >
+        <Text size="sm" weight={500}>
+          {title}
+        </Text>
+        <Text size="sm" align="right" color="gray">
+          {value}
+        </Text>
+      </Box>
+      <Divider />
+    </div>
+  );
+
   const columns = [
     {
       Header: "Drive",
@@ -187,38 +211,35 @@ export default function About() {
       />
       <Grid>
         <Col span={7}>
-          <Card shadow="sm" withBorder sx={{ marginBottom: 10 }}>
-            <Group
-              position="apart"
-              style={{ marginBottom: 5, marginTop: theme.spacing.sm }}
-            >
-              <Text weight="bold">Details</Text>
-              <Badge color="pink" variant="light">
+          <Card sx={{ marginBottom: 10 }}>
+            <Group position="apart" sx={{ marginBottom: 10 }}>
+              <Group>
+                <ThemeIcon color="gray" variant="light">
+                  <Article weight="bold" />
+                </ThemeIcon>
+                <Text weight={500}>Details</Text>
+              </Group>
+              <Button
+                type="button"
+                size="xs"
+                variant="light"
+                color="yellow"
+                onClick={showModal}
+              >
                 Edit
-              </Badge>
+              </Button>
             </Group>
-            <Grid>
-              <Col span={3}>
-                <Text size="sm" weight={500} color="gray">
-                  Asset Number
-                </Text>
-                <Text size="sm">{data.asset_number}</Text>
-              </Col>
-              <Col span={3}>
-                <Text size="sm" weight={500}>
-                  Location
-                </Text>
-                <Text size="sm">{data.location}</Text>
-              </Col>
-              <Col span={3}>
-                <Text size="sm" weight={500}>
-                  Status
-                </Text>
+            <Group grow direction="column" sx={{ gap: 0 }}>
+              {DetailInfo("Asset Number", data.asset_number)}
+              {DetailInfo("Location", data.location.name)}
+              {DetailInfo("Brand", data.brand && data.bread.name)}
+              {DetailInfo(
+                "Status",
                 <Badge size="sm" color="green">
                   {data.status}
                 </Badge>
-              </Col>
-            </Grid>
+              )}
+            </Group>
           </Card>
           <Card>
             <Group
